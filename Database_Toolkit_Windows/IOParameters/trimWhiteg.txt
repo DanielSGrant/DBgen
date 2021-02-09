@@ -1,0 +1,2 @@
+.././Make_Database/Input/sequence.gb
+.././Make_Database/Output/sequencenw.gb
