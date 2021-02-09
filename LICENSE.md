@@ -1,0 +1,1 @@
+This software may be freely used by anyone for non-commercial or educational use. This software is still in its development and testing phases, ABSOLUTELY NO GUARANTEES ARE GIVEN FOR ITS EFFICACY. Please confirm files generated through its use appear to be accurate.
