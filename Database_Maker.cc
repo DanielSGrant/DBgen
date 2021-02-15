@@ -11,65 +11,91 @@ Feb 10, 2021
 Input Data: sequence.fasta and sequence.gb files from NCBI
 */
 
+#include "DBConfig.h.in"
+
 #include <iostream>
 #include <fstream>
 #include <cstring>
 #include <string>
 
+// struct Sequence
+// {
+// 	std::string cds;
+// 	struct sequence *next;
+// };
 
-struct gene
+struct Gene
 {
 	std::string taxonomy;
-	std::string sequence[20]; 
+	//struct Sequence sequence;
+	std::string sequence; 
 };
 
-void getGBData(std::ifstream &, std::string &, gene [], int &);
+struct Node
+{
+	struct Gene gene;
+	struct Node *next;
+};
 
-const int ARRAY_SIZE = 5000;
+void getGBData(std::ifstream &, Node **);
+void addGene(struct Node **, Gene);
+void displayList(struct Node *node);
+void writeList(struct Node *node, std::ofstream &, std::ofstream &);
+void deleteList(Node**);
+
+
+const int ASCII9 = static_cast <int> ('9');
 
 int main()
 {
 	std::ifstream in;
-	std::ofstream out1, out2; 
-	std::string input1, input2, output1, output2;
-	gene data[ARRAY_SIZE];
-	int size = 0;
+	std::ofstream valid, invalid; 
+	std::string input, output;
+	struct Node *head = NULL;
+
 
 	//Pull information from .gb file
-	input1 = "sequence.gb";
-	getGBData(in, input1, data, size);
-
-	for(int i = 0; i < size; i++)
-	{
-		std::cout << data[i].taxonomy << std::endl << data[i].sequence[0] << std::endl;
-	}
+	getGBData(in, &head);
+	//displayList(head);
+	writeList(head, valid, invalid);
+	deleteList(&head);
 
 	return 0;
 }
 
-//Function description: This function reads in genbank data from the opened file into an array
+//Function description: This function reads in genbank data from the opened file into an linked list
 //Funtion parameters Input:
 //                  Output: 
 //                  Input/Output: ifstream in, ofstream out;
 //Returns:
-void getGBData(std::ifstream &in, std::string &input, gene data[], int &s)
+void getGBData(std::ifstream &in, Node **data)
 {
+	std::string input = "sequence.gb";
 	do
 	{
 		in.open(input.c_str());
-		std::cout << "Failed to open file, please enter filename: ";
-		std::cin >> input;
+		if(in.fail())
+		{
+			std::cout << "Failed to open default filename, please enter filename: ";
+			std::cin >> input;
+		}
 	}
 	while(in.fail());
+
+	std::cout << "File opened successfully" << std::endl;
 	
-	std::string temp, locus, tax, species, sequence;
+	std::string temp, tax, species, sequence;
+	Gene tempGene;
+	bool write;
 
 	in >> temp;
 	while(!in.eof())
 	{
+		write = true;
 		//Reset tax to empty string for next round of reads
 		tax = "";
 		sequence = "";
+
 
 		//Read until you hit ORGANISM. then read in taxonomy
 		if(temp == "ORGANISM")
@@ -135,26 +161,45 @@ void getGBData(std::ifstream &in, std::string &input, gene data[], int &s)
 				}
 
 			}
-			while(temp == "ORGANISM")
+
+			//Read until sequence data starts or
+			while(temp != "ORIGIN" && !in.eof())
 			{
 				in >> temp;
-				if(temp == "ORIGIN")
+				if(temp == "//")
 				{
-					while(temp != "//")
+					write = false;
+					break;
+				}
+				
+			}
+			if(temp == "ORIGIN")
+			{
+				in >> temp;
+				do
+				{
+					if(static_cast <int> (temp[0]) > ASCII9 && (temp[0] == 'a' || temp[0] == 'c' ||
+						temp[0] == 'g' || temp[0] == 't' || temp[0] == 'n'))
 					{
 						sequence += temp;
-						in >> temp;	
 					}
 					
-					
+					in >> temp;	
 				}
+				while(temp != "//");
+				
 			}
+			//write data to array
+			if(write)
+			{
+				tempGene.taxonomy = tax;
+				tempGene.sequence = sequence;
+				addGene(data, tempGene);
+			}
+			
 
 		}
-		//write data to array
-		data[s].taxonomy = tax;
-		data[s].sequence[0] = sequence;
-		s++;
+		
 		//read in new value for next loop
 		in >> temp;
 
@@ -163,3 +208,140 @@ void getGBData(std::ifstream &in, std::string &input, gene data[], int &s)
 	in.close();
 
 }
+
+void addGene(struct Node **head, Gene Gene_data)
+{
+	//Create and allocate new node
+	struct Node* newNode = new Node;
+	struct Node* last = *head;
+
+	//Assign data to the node
+	newNode -> gene = Gene_data;
+
+	//Make next pointer of new node NULL
+	newNode -> next = NULL;
+
+	//if List is empty, new node becomes first node
+	if(*head == NULL)
+	{
+		*head = newNode;
+		return;
+	}
+
+	//else traverse to last node
+	while(last -> next != NULL)
+	{
+		last = last -> next;
+	}
+
+	//change next of last node
+	last -> next = newNode;
+	return;
+}
+
+void displayList(struct Node *node)
+{
+   //traverse the list to display each node
+   while (node != NULL)
+   {
+      std::cout << node->gene.taxonomy << std::endl 
+      << node->gene.sequence << std::endl;
+      node = node->next;
+   }
+ 
+	if(node== NULL)
+	std::cout << "Finished Displaying List" << std::endl; 
+} 
+
+void writeList(struct Node *node, std::ofstream &valid, std::ofstream &invalid)
+{
+   std::string v = "valid.fasta";
+   std::string i = "invalid.fasta";
+   bool isValid;
+   int count;
+
+   do
+	{
+		valid.open(v.c_str());
+		if(valid.fail())
+		{
+			std::cout << "Failed to open default filename, please enter filename: ";
+			std::cin >> v;	
+		}
+
+	}
+	while(valid.fail());
+
+	do
+	{
+		invalid.open(i.c_str());
+		
+		if(invalid.fail())
+		{
+			std::cout << "Failed to open default filename, please enter filename: ";
+			std::cin >> i;	
+		}
+	}
+	while(invalid.fail());
+
+	std::cout << "Output files opened successfully, writing to output files." << std::endl;
+
+   //traverse the list to display each node
+   while (node != NULL)
+   {
+   		isValid = false;
+   		count = 0;
+   		
+   		
+   		for(unsigned int i = 0; i < node->gene.taxonomy.length(); i++)
+   		{
+   			if(node->gene.taxonomy[i] == ';')
+   			{
+   				count++;
+   			}
+   			
+   		}
+   		
+   		if(count <= 8)
+		{
+			isValid = true;
+		}
+
+   		if(isValid)
+   		{
+   			valid << ">" << node->gene.taxonomy << std::endl 
+			<< node->gene.sequence << std::endl;
+			
+   		}
+   		else
+   		{
+   			invalid << ">" << node->gene.taxonomy << std::endl 
+			<< node->gene.sequence << std::endl;
+   		}
+   		node = node->next;
+		
+   }
+ 
+	if(node== NULL)
+	return;
+} 
+
+void deleteList(Node** head)
+{
+ 
+    /* deref  to get the real head */
+    Node* current = *head;
+    Node* next = NULL;
+ 
+    while (current != NULL) 
+    {
+        next = current->next;
+        delete current;
+        current = next;
+    }
+ 
+    /* deref head_ref to affect the real head back
+        in the caller. */
+    *head = NULL;
+}
+
