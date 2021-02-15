@@ -1,2 +1,0 @@
-./Make_Database/Output/sequencenw.gb
-./Make_Database/Output/trimmed.gb
