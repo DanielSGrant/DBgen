@@ -1,3 +1,0 @@
-.././Make_Database/Output/finished.fasta
-.././Make_Database/Output/valid.fasta
-.././Make_Database/Output/invalid.fasta

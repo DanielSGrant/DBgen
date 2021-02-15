@@ -1,2 +1,0 @@
-.././Make_Database/Output/sequencenw.fasta
-.././Make_Database/Output/trimmed.fasta
