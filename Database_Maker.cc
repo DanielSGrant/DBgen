@@ -11,7 +11,6 @@ Feb 10, 2021
 Input Data: sequence.fasta and sequence.gb files from NCBI
 */
 
-#include "DBConfig.h.in"
 
 #include <iostream>
 #include <fstream>
@@ -39,7 +38,6 @@ struct Node
 
 void getGBData(std::ifstream &, Node **);
 void addGene(struct Node **, Gene);
-void displayList(struct Node *node);
 void writeList(struct Node *node, std::ofstream &, std::ofstream &);
 void deleteList(Node**);
 
@@ -50,7 +48,6 @@ int main()
 {
 	std::ifstream in;
 	std::ofstream valid, invalid; 
-	std::string input, output;
 	struct Node *head = NULL;
 
 
@@ -148,7 +145,7 @@ void getGBData(std::ifstream &in, Node **data)
 			//concatenate species onto string of taxonomix data
 			tax += species + ";";
 			//change spaces and any other punctuation to underscore character
-			for(unsigned int i = 0; i < tax.length(); i++)
+			for(int i = 0; i < static_cast <int> (tax.length()); i++)
 			{
 				if(tax[i] == '.')
 				{
@@ -239,19 +236,19 @@ void addGene(struct Node **head, Gene Gene_data)
 	return;
 }
 
-void displayList(struct Node *node)
-{
-   //traverse the list to display each node
-   while (node != NULL)
-   {
-      std::cout << node->gene.taxonomy << std::endl 
-      << node->gene.sequence << std::endl;
-      node = node->next;
-   }
+// void displayList(struct Node *node)
+// {
+//    //traverse the list to display each node
+//    while (node != NULL)
+//    {
+//       std::cout << node->gene.taxonomy << std::endl 
+//       << node->gene.sequence << std::endl;
+//       node = node->next;
+//    }
  
-	if(node== NULL)
-	std::cout << "Finished Displaying List" << std::endl; 
-} 
+// 	if(node== NULL)
+// 	std::cout << "Finished Displaying List" << std::endl; 
+// } 
 
 void writeList(struct Node *node, std::ofstream &valid, std::ofstream &invalid)
 {
@@ -293,7 +290,7 @@ void writeList(struct Node *node, std::ofstream &valid, std::ofstream &invalid)
    		count = 0;
    		
    		
-   		for(unsigned int i = 0; i < node->gene.taxonomy.length(); i++)
+   		for(int i = 0; i < static_cast <int> (node->gene.taxonomy.length()); i++)
    		{
    			if(node->gene.taxonomy[i] == ';')
    			{
