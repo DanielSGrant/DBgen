@@ -38,24 +38,24 @@ struct Node
 
 void getGBData(std::ifstream &, Node **, std::string);
 void addGene(struct Node **, Gene);
-void writeList(struct Node *node, std::ofstream &, std::ofstream &, std::string);
+void writeList(struct Node *node, std::ofstream &, std::ofstream &, std::string, std::string);
 void deleteList(Node**);
-void DatabaseMaker(std::string, std::string);
-void DatabaseMerge(std::string, std::string, std::string);
+void DatabaseMaker(std::string, std::string, std::string);
+void DatabaseMerge(std::string, std::string, std::string, std::string);
 void readList(std::ifstream &, std::string, std::ifstream &, std::string, Node **, Node **);
 bool checkUniques(Node**, const Gene &);
-void writeList(struct Node *, std::ofstream &, struct Node *, std::ofstream &, std::string);
+void writeList(struct Node *, std::ofstream &, std::string, struct Node *, std::ofstream &, std::string);
 
 const int ASCII9 = static_cast <int> ('9');
 
 int main()
 {
-	//DatabaseMaker("./sequence.gb", "./" );
-	DatabaseMerge("./valid.fasta", "./invalid.fasta", "./");
+	DatabaseMaker("./sequence.gb", "./valid.fasta", "./invalid.fasta" );
+	DatabaseMerge("./valid.fasta", "./invalid.fasta", "./uniqes.fasta", "./repeats.fasta");
 	return 0;
 }
 
-void DatabaseMaker(std::string inputFile, std::string outputFilepath)
+void DatabaseMaker(std::string inputFile, std::string outputFile1, std::string outputFile2)
 {
 	std::ifstream in;
 	std::ofstream valid, invalid; 
@@ -64,7 +64,7 @@ void DatabaseMaker(std::string inputFile, std::string outputFilepath)
 
 	//Pull information from .gb file
 	getGBData(in, &head, inputFile);
-	writeList(head, valid, invalid, outputFilepath);
+	writeList(head, valid, invalid, outputFile1, outputFile2);
 	deleteList(&head);
 }
 
@@ -258,20 +258,18 @@ void addGene(struct Node **head, Gene Gene_data)
 // 	std::cout << "Finished Displaying List" << std::endl; 
 // } 
 
-void writeList(struct Node *node, std::ofstream &valid, std::ofstream &invalid, std::string output)
+void writeList(struct Node *node, std::ofstream &valid, std::ofstream &invalid, std::string output1, std::string output2)
 {
-   std::string v = output + "valid.fasta";
-   std::string i = output + "invalid.fasta";
    bool isValid;
    int count;
 
    do
 	{
-		valid.open(v.c_str());
+		valid.open(output1.c_str());
 		if(valid.fail())
 		{
 			std::cout << "Failed to open default filename, please enter filename: ";
-			std::cin >> v;	
+			std::cin >> output1;	
 		}
 
 	}
@@ -279,12 +277,12 @@ void writeList(struct Node *node, std::ofstream &valid, std::ofstream &invalid, 
 
 	do
 	{
-		invalid.open(i.c_str());
+		invalid.open(output2.c_str());
 		
 		if(invalid.fail())
 		{
 			std::cout << "Failed to open default filename, please enter filename: ";
-			std::cin >> i;	
+			std::cin >> output2;	
 		}
 	}
 	while(invalid.fail());
@@ -354,22 +352,19 @@ void deleteList(Node** head)
 Functions for database merger
 ******************************************************************************/
 
-void DatabaseMerge(std::string inputFile1, std::string inputFile2, std::string outputFilepath)
+void DatabaseMerge(std::string inputFile1, std::string inputFile2, std::string outputFile1, std::string outputFile2)
 {
 	std::ifstream in1, in2;
 	std::ofstream out1, out2;
 	struct Node *uniques = NULL, *repeats = NULL;
-
-	std::cout << "Variables created" << std::endl;
 	
+	//Reading in files and creating linked lists
 	readList(in1, inputFile1, in2, inputFile2, &uniques, &repeats);
-	std::cout << "Files read into linked list" << std::endl;
-	writeList(uniques, out1, repeats, out2, outputFilepath);
-	std::cout << "New files written" << std::endl;
-
+	//Writing files to unique and repeat files
+	writeList(uniques, out1, outputFile1, repeats, out2, outputFile2);
+	//Deleting lists and freeing allocated memory
 	deleteList(&uniques);
 	deleteList(&repeats);
-	std::cout << "Lists deleted" << std::endl;
 }
 
 //Function description This function reads data from the opened files into a linked list
@@ -392,7 +387,6 @@ void readList(std::ifstream &in1, std::string input1, std::ifstream &in2, std::s
 		}
 	}
 	while(in1.fail());
-	std::cout << "File 1 opened" << std::endl;
 
 	//Read in the first data point
 	in1 >> gene.taxonomy >> gene.sequence;
@@ -407,7 +401,6 @@ void readList(std::ifstream &in1, std::string input1, std::ifstream &in2, std::s
 	//close first file
 	in1.close();
 
-	std::cout << "File1 Closed" << std::endl;
 	//Open second file
 	do
 	{
@@ -419,14 +412,12 @@ void readList(std::ifstream &in1, std::string input1, std::ifstream &in2, std::s
 		}
 	}
 	while(in2.fail());
-	std::cout << "File 2 Opened" << std::endl;
 
 	//Read in the first data point
 	in2 >> gene.taxonomy >> gene.sequence;
 
 	while(!in2.eof())
 	{
-		std::cout << "Loop entered" << std::endl;
 		//Append new read to uniques linked list if unique
 		if(checkUniques(uniques, gene))
 		{
@@ -437,18 +428,15 @@ void readList(std::ifstream &in1, std::string input1, std::ifstream &in2, std::s
 		{
 			addGene(repeats, gene);
 		}
-		std::cout << "Finished checking uniques" << std::endl;
 		in2 >> gene.taxonomy >> gene.sequence;
 	}
 	//close second file
 	in2.close();
-	std::cout << "File 2 closed" << std::endl;
 
 }
 
 bool checkUniques(Node** head, const Gene &gene)
 {
-    std::cout << "Checking uniques" << std::endl;
     // dereference to get the real head
     Node* current = *head;
 
@@ -465,18 +453,16 @@ bool checkUniques(Node** head, const Gene &gene)
     return true;
 }
 
-void writeList(struct Node *uniques, std::ofstream &out1, struct Node *repeats, std::ofstream &out2, std::string output)
+void writeList(struct Node *uniques, std::ofstream &out1, std::string output1, struct Node *repeats, std::ofstream &out2, std::string output2)
 {
-   std::string u = output + "uniques.fasta";
-   std::string r = output + "repeats.fasta";
 
    do
 	{
-		out1.open(u.c_str());
+		out1.open(output1.c_str());
 		if(out1.fail())
 		{
 			std::cout << "Failed to open default filename, please enter filename: ";
-			std::cin >> u;	
+			std::cin >> output1;	
 		}
 
 	}
@@ -484,12 +470,12 @@ void writeList(struct Node *uniques, std::ofstream &out1, struct Node *repeats, 
 
 	do
 	{
-		out2.open(r.c_str());
+		out2.open(output2.c_str());
 		
 		if(out2.fail())
 		{
 			std::cout << "Failed to open default filename, please enter filename: ";
-			std::cin >> r;	
+			std::cin >> output2;	
 		}
 	}
 	while(out2.fail());
