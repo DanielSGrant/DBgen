@@ -36,15 +36,26 @@ struct Node
 	struct Node *next;
 };
 
-void getGBData(std::ifstream &, Node **);
+void getGBData(std::ifstream &, Node **, std::string);
 void addGene(struct Node **, Gene);
-void writeList(struct Node *node, std::ofstream &, std::ofstream &);
+void writeList(struct Node *node, std::ofstream &, std::ofstream &, std::string);
 void deleteList(Node**);
-
+void DatabaseMaker(std::string, std::string);
+void DatabaseMerge(std::string, std::string, std::string);
+void readList(std::ifstream &, std::string, std::ifstream &, std::string, Node **, Node **);
+bool checkUniques(Node**, const Gene &);
+void writeList(struct Node *, std::ofstream &, struct Node *, std::ofstream &, std::string);
 
 const int ASCII9 = static_cast <int> ('9');
 
 int main()
+{
+	//DatabaseMaker("./sequence.gb", "./" );
+	DatabaseMerge("./valid.fasta", "./invalid.fasta", "./");
+	return 0;
+}
+
+void DatabaseMaker(std::string inputFile, std::string outputFilepath)
 {
 	std::ifstream in;
 	std::ofstream valid, invalid; 
@@ -52,12 +63,9 @@ int main()
 
 
 	//Pull information from .gb file
-	getGBData(in, &head);
-	//displayList(head);
-	writeList(head, valid, invalid);
+	getGBData(in, &head, inputFile);
+	writeList(head, valid, invalid, outputFilepath);
 	deleteList(&head);
-
-	return 0;
 }
 
 //Function description: This function reads in genbank data from the opened file into an linked list
@@ -65,9 +73,9 @@ int main()
 //                  Output: 
 //                  Input/Output: ifstream in, ofstream out;
 //Returns:
-void getGBData(std::ifstream &in, Node **data)
+void getGBData(std::ifstream &in, Node **data, std::string input)
 {
-	std::string input = "sequence.gb";
+	
 	do
 	{
 		in.open(input.c_str());
@@ -79,7 +87,7 @@ void getGBData(std::ifstream &in, Node **data)
 	}
 	while(in.fail());
 
-	std::cout << "File opened successfully" << std::endl;
+	std::cout << "Input file opened successfully" << std::endl;
 	
 	std::string temp, tax, species, sequence;
 	Gene tempGene;
@@ -250,10 +258,10 @@ void addGene(struct Node **head, Gene Gene_data)
 // 	std::cout << "Finished Displaying List" << std::endl; 
 // } 
 
-void writeList(struct Node *node, std::ofstream &valid, std::ofstream &invalid)
+void writeList(struct Node *node, std::ofstream &valid, std::ofstream &invalid, std::string output)
 {
-   std::string v = "valid.fasta";
-   std::string i = "invalid.fasta";
+   std::string v = output + "valid.fasta";
+   std::string i = output + "invalid.fasta";
    bool isValid;
    int count;
 
@@ -342,3 +350,170 @@ void deleteList(Node** head)
     *head = NULL;
 }
 
+/*****************************************************************************
+Functions for database merger
+******************************************************************************/
+
+void DatabaseMerge(std::string inputFile1, std::string inputFile2, std::string outputFilepath)
+{
+	std::ifstream in1, in2;
+	std::ofstream out1, out2;
+	struct Node *uniques = NULL, *repeats = NULL;
+
+	std::cout << "Variables created" << std::endl;
+	
+	readList(in1, inputFile1, in2, inputFile2, &uniques, &repeats);
+	std::cout << "Files read into linked list" << std::endl;
+	writeList(uniques, out1, repeats, out2, outputFilepath);
+	std::cout << "New files written" << std::endl;
+
+	deleteList(&uniques);
+	deleteList(&repeats);
+	std::cout << "Lists deleted" << std::endl;
+}
+
+//Function description This function reads data from the opened files into a linked list
+//Funtion parameters Input:
+//                  Output:
+//                  Input/Output: gene [], int &size
+//Returns:
+void readList(std::ifstream &in1, std::string input1, std::ifstream &in2, std::string input2, Node **uniques, Node **repeats)
+{
+	Gene gene;
+
+	//Open and process first file
+	do
+	{
+		in1.open(input1.c_str());
+		if(in1.fail())
+		{
+			std::cout << "Failed to open default filename, please enter filename: ";
+			std::cin >> input1;
+		}
+	}
+	while(in1.fail());
+	std::cout << "File 1 opened" << std::endl;
+
+	//Read in the first data point
+	in1 >> gene.taxonomy >> gene.sequence;
+
+	while(!in1.eof())
+	{
+		//Repeat until entire file is in linked list
+		addGene(uniques, gene);
+		in1 >> gene.taxonomy >> gene.sequence;
+	}
+
+	//close first file
+	in1.close();
+
+	std::cout << "File1 Closed" << std::endl;
+	//Open second file
+	do
+	{
+		in2.open(input2.c_str());
+		if(in2.fail())
+		{
+			std::cout << "Failed to open default filename, please enter filename: ";
+			std::cin >> input2;
+		}
+	}
+	while(in2.fail());
+	std::cout << "File 2 Opened" << std::endl;
+
+	//Read in the first data point
+	in2 >> gene.taxonomy >> gene.sequence;
+
+	while(!in2.eof())
+	{
+		std::cout << "Loop entered" << std::endl;
+		//Append new read to uniques linked list if unique
+		if(checkUniques(uniques, gene))
+		{
+			addGene(uniques, gene);
+		}
+		//Append read to repeats if false
+		else
+		{
+			addGene(repeats, gene);
+		}
+		std::cout << "Finished checking uniques" << std::endl;
+		in2 >> gene.taxonomy >> gene.sequence;
+	}
+	//close second file
+	in2.close();
+	std::cout << "File 2 closed" << std::endl;
+
+}
+
+bool checkUniques(Node** head, const Gene &gene)
+{
+    std::cout << "Checking uniques" << std::endl;
+    // dereference to get the real head
+    Node* current = *head;
+
+ 
+    while (current != NULL) 
+    {
+        if(current->gene.taxonomy == gene.taxonomy && current->gene.sequence == gene.sequence)
+        {
+        	return false;
+        }
+        current = current->next;
+    }
+ 
+    return true;
+}
+
+void writeList(struct Node *uniques, std::ofstream &out1, struct Node *repeats, std::ofstream &out2, std::string output)
+{
+   std::string u = output + "uniques.fasta";
+   std::string r = output + "repeats.fasta";
+
+   do
+	{
+		out1.open(u.c_str());
+		if(out1.fail())
+		{
+			std::cout << "Failed to open default filename, please enter filename: ";
+			std::cin >> u;	
+		}
+
+	}
+	while(out1.fail());
+
+	do
+	{
+		out2.open(r.c_str());
+		
+		if(out2.fail())
+		{
+			std::cout << "Failed to open default filename, please enter filename: ";
+			std::cin >> r;	
+		}
+	}
+	while(out2.fail());
+
+	std::cout << "Output files opened successfully, writing to output files." << std::endl;
+
+   //traverse the list to display each node
+   while (uniques != NULL)
+   {
+   		out1 << ">" << uniques->gene.taxonomy << std::endl << uniques->gene.sequence << std::endl;
+   		uniques = uniques->next;
+		
+   }
+
+   //close uniues output file
+   out1.close();
+
+   while (repeats != NULL)
+   {
+   		out2 << ">" << uniques->gene.taxonomy << std::endl << uniques->gene.sequence << std::endl;
+   		repeats = repeats->next;
+		
+   }
+ 
+ 	//close uniues output file
+	out2.close();
+}
