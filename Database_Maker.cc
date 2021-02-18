@@ -64,18 +64,20 @@ void DatabaseMaker(std::string inputFile, std::string outputFile1, std::string o
 
 	//Pull information from .gb file
 	getGBData(in, &head, inputFile);
+	//Write valid and invalid data to output files 
 	writeList(head, valid, invalid, outputFile1, outputFile2);
+	//Free allocated memory
 	deleteList(&head);
 }
 
 //Function description: This function reads in genbank data from the opened file into an linked list
-//Funtion parameters Input:
+//Funtion parameters Input: string input - input file name
 //                  Output: 
-//                  Input/Output: ifstream in, ofstream out;
+//                  Input/Output: ifstream in - input file, Node **data - pointer to linked list 
 //Returns:
 void getGBData(std::ifstream &in, Node **data, std::string input)
 {
-	
+	//Open file
 	do
 	{
 		in.open(input.c_str());
@@ -89,6 +91,7 @@ void getGBData(std::ifstream &in, Node **data, std::string input)
 
 	std::cout << "Input file for database generation opened successfully" << std::endl;
 	
+	//Variable declaration
 	std::string temp, tax, species, sequence;
 	Gene tempGene;
 	bool write;
@@ -114,6 +117,7 @@ void getGBData(std::ifstream &in, Node **data, std::string input)
 				species = species.substr(species.find_first_not_of(' '),species.length() - 1);
 			}
 
+			//Read in taxonomy
 			do
 			{
 
@@ -136,7 +140,7 @@ void getGBData(std::ifstream &in, Node **data, std::string input)
 				{
 					tax = tax.substr(0,tax.find_last_of(";") + 1);
 				}
-				//If the program reads to far into the next field
+				//If the program reads to far into the next field terinate loop
 				else if (temp == "REFERENCE") 
 				{
 					tax.back() = '.';
@@ -168,7 +172,7 @@ void getGBData(std::ifstream &in, Node **data, std::string input)
 
 			}
 
-			//Read until sequence data starts or
+			//Read until sequence data starts or you hit the end of that data point
 			while(temp != "ORIGIN" && in >> temp)
 			{
 				if(temp == "//")
@@ -178,6 +182,7 @@ void getGBData(std::ifstream &in, Node **data, std::string input)
 				}
 				
 			}
+			//if you reach ORIGIN, read in the sequence data
 			if(temp == "ORIGIN")
 			{
 				in >> temp;
@@ -194,7 +199,7 @@ void getGBData(std::ifstream &in, Node **data, std::string input)
 				while(temp != "//");
 				
 			}
-			//write data to array
+			//write data to array if new data is available
 			if(write)
 			{
 				tempGene.taxonomy = tax;
@@ -207,11 +212,16 @@ void getGBData(std::ifstream &in, Node **data, std::string input)
 		
 
 	}
-
+	//Close input file
 	in.close();
 
 }
 
+//Function description: This function appeds a new node to a linked list
+//Funtion parameters Input: Gene Gene_data
+//                  Output: 
+//                  Input/Output: Node **head 
+//Returns:
 void addGene(struct Node **head, Gene Gene_data)
 {
 	//Create and allocate new node
@@ -242,6 +252,7 @@ void addGene(struct Node **head, Gene Gene_data)
 	return;
 }
 
+//Function for displaying a linked list, for testing purposes only
 // void displayList(struct Node *node)
 // {
 //    //traverse the list to display each node
@@ -256,11 +267,17 @@ void addGene(struct Node **head, Gene Gene_data)
 // 	std::cout << "Finished Displaying List" << std::endl; 
 // } 
 
+
+//Function description: This function writes the values stored in a linked list to 2 output files
+//Funtion parameters Input: strings containing names of output files
+//                  Output: 
+//                  Input/Output: Node *node, ofstream &valid and &invalid 
+//Returns:
 void writeList(struct Node *node, std::ofstream &valid, std::ofstream &invalid, std::string output1, std::string output2)
 {
    bool isValid;
    int count;
-
+   //Open first output file
    do
 	{
 		valid.open(output1.c_str());
@@ -273,6 +290,7 @@ void writeList(struct Node *node, std::ofstream &valid, std::ofstream &invalid, 
 	}
 	while(valid.fail());
 
+	//open second output file
 	do
 	{
 		invalid.open(output2.c_str());
@@ -287,13 +305,14 @@ void writeList(struct Node *node, std::ofstream &valid, std::ofstream &invalid, 
 
 	std::cout << "Output files opened successfully, writing to output files." << std::endl;
 
-   //traverse the list to display each node
+   //traverse the list to print each node to output file
    while (node != NULL)
    {
+   		//Reset variables
    		isValid = false;
    		count = 0;
    		
-   		
+   		//Check how many entries there are for taxonomy
    		for(int i = 0; i < static_cast <int> (node->gene.taxonomy.length()); i++)
    		{
    			if(node->gene.taxonomy[i] == ';')
@@ -302,12 +321,12 @@ void writeList(struct Node *node, std::ofstream &valid, std::ofstream &invalid, 
    			}
    			
    		}
-   		
+   		//If there are less than 8 pieces of taxonomy info it is valid
    		if(count <= 8)
 		{
 			isValid = true;
 		}
-
+		//Write valids to valid output file and invalids to invalid output file
    		if(isValid)
    		{
    			valid << ">" << node->gene.taxonomy << std::endl 
@@ -319,21 +338,31 @@ void writeList(struct Node *node, std::ofstream &valid, std::ofstream &invalid, 
    			invalid << ">" << node->gene.taxonomy << std::endl 
 			<< node->gene.sequence << std::endl;
    		}
+   		//Move to next node
    		node = node->next;
 		
    }
  
 	if(node== NULL)
-	return;
+	{
+		return;	
+	}
+	
 } 
 
+//Function description: This function frees all allocated memory from a linked list
+//Funtion parameters Input: 
+//                  Output: 
+//                  Input/Output: Node **head
+//Returns:
 void deleteList(Node** head)
 {
  
     /* deref  to get the real head */
     Node* current = *head;
     Node* next = NULL;
- 
+ 	
+ 	//Read until the end of list, deleting each node
     while (current != NULL) 
     {
         next = current->next;
@@ -341,8 +370,7 @@ void deleteList(Node** head)
         current = next;
     }
  
-    /* deref head_ref to affect the real head back
-        in the caller. */
+    // deref head_ref to affect the real head back in the caller.
     *head = NULL;
 }
 
@@ -350,6 +378,11 @@ void deleteList(Node** head)
 Functions for database merger
 ******************************************************************************/
 
+//Function description: This function merges two databases and keeps unique values
+//Funtion parameters Input: Names of two input and two output file names
+//                  Output: 
+//                  Input/Output: 
+//Returns:
 void DatabaseMerge(std::string inputFile1, std::string inputFile2, std::string outputFile1, std::string outputFile2)
 {
 	std::ifstream in1, in2;
@@ -366,9 +399,9 @@ void DatabaseMerge(std::string inputFile1, std::string inputFile2, std::string o
 }
 
 //Function description This function reads data from the opened files into a linked list
-//Funtion parameters Input:
+//Funtion parameters Input: filenames for both input files
 //                  Output:
-//                  Input/Output: gene [], int &size
+//                  Input/Output: ifstream &in1 and &in2, Node **uniques and **repeats
 //Returns:
 void readList(std::ifstream &in1, std::string input1, std::ifstream &in2, std::string input2, Node **uniques, Node **repeats)
 {
@@ -434,12 +467,17 @@ void readList(std::ifstream &in1, std::string input1, std::ifstream &in2, std::s
 
 }
 
+//Function description: This function checks whether a gene is a unique value or a repeat
+//Funtion parameters Input: Names of two input and two output file names
+//                  Output: 
+//                  Input/Output: 
+//Returns:
 bool checkUniques(Node** head, const Gene &gene)
 {
     // dereference to get the real head
     Node* current = *head;
 
- 
+ 	//Read to the end of the list, comparing values to the gene
     while (current != NULL) 
     {
         if(current->gene.taxonomy == gene.taxonomy && current->gene.sequence == gene.sequence)
@@ -452,9 +490,14 @@ bool checkUniques(Node** head, const Gene &gene)
     return true;
 }
 
+//Function description: This writes the contents of a linked list to 2 output files
+//Funtion parameters Input: Names of two output file names
+//                  Output: 
+//                  Input/Output: Node *uniques and * repeats, ofstream &out1 and &out2
+//Returns:
 void writeList(struct Node *uniques, std::ofstream &out1, std::string output1, struct Node *repeats, std::ofstream &out2, std::string output2)
 {
-
+	//open files
    do
 	{
 		out1.open(output1.c_str());
@@ -481,7 +524,7 @@ void writeList(struct Node *uniques, std::ofstream &out1, std::string output1, s
 
 	std::cout << "Output files opened successfully, writing to output files." << std::endl;
 
-   //traverse the list to display each node
+   //traverse the list to print each node to uniques output file
    while (uniques != NULL)
    {
    		out1 << ">" << uniques->gene.taxonomy << std::endl << uniques->gene.sequence << std::endl;
@@ -489,9 +532,10 @@ void writeList(struct Node *uniques, std::ofstream &out1, std::string output1, s
 		
    }
 
-   //close uniues output file
+   //close uniques output file
    out1.close();
 
+	//traverse the list to print each node to repeats output file
    while (repeats != NULL)
    {
    		out2 << ">" << uniques->gene.taxonomy << std::endl << uniques->gene.sequence << std::endl;
@@ -499,6 +543,6 @@ void writeList(struct Node *uniques, std::ofstream &out1, std::string output1, s
 		
    }
  
- 	//close uniues output file
+ 	//close repeats output file
 	out2.close();
 }
