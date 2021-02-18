@@ -51,7 +51,7 @@ const int ASCII9 = static_cast <int> ('9');
 int main()
 {
 	DatabaseMaker("./sequence.gb", "./valid.fasta", "./invalid.fasta" );
-	DatabaseMerge("./valid.fasta", "./invalid.fasta", "./uniqes.fasta", "./repeats.fasta");
+	DatabaseMerge("./valid.fasta", "./invalid.fasta", "./uniques.fasta", "./repeats.fasta");
 	return 0;
 }
 
@@ -87,14 +87,14 @@ void getGBData(std::ifstream &in, Node **data, std::string input)
 	}
 	while(in.fail());
 
-	std::cout << "Input file opened successfully" << std::endl;
+	std::cout << "Input file for database generation opened successfully" << std::endl;
 	
 	std::string temp, tax, species, sequence;
 	Gene tempGene;
 	bool write;
 
-	in >> temp;
-	while(!in.eof())
+	
+	while(in >> temp)
 	{
 		write = true;
 		//Reset tax to empty string for next round of reads
@@ -168,9 +168,8 @@ void getGBData(std::ifstream &in, Node **data, std::string input)
 			}
 
 			//Read until sequence data starts or
-			while(temp != "ORIGIN" && !in.eof())
+			while(temp != "ORIGIN" && in >> temp)
 			{
-				in >> temp;
 				if(temp == "//")
 				{
 					write = false;
@@ -205,8 +204,6 @@ void getGBData(std::ifstream &in, Node **data, std::string input)
 
 		}
 		
-		//read in new value for next loop
-		in >> temp;
 
 	}
 
@@ -389,13 +386,13 @@ void readList(std::ifstream &in1, std::string input1, std::ifstream &in2, std::s
 	while(in1.fail());
 
 	//Read in the first data point
-	in1 >> gene.taxonomy >> gene.sequence;
+	std::cout << "First input file for database merging opened successfully" << std::endl;
+	
 
-	while(!in1.eof())
+	while(in1 >> gene.taxonomy >> gene.sequence)
 	{
 		//Repeat until entire file is in linked list
 		addGene(uniques, gene);
-		in1 >> gene.taxonomy >> gene.sequence;
 	}
 
 	//close first file
@@ -413,10 +410,12 @@ void readList(std::ifstream &in1, std::string input1, std::ifstream &in2, std::s
 	}
 	while(in2.fail());
 
-	//Read in the first data point
-	in2 >> gene.taxonomy >> gene.sequence;
+	std::cout << "Second input file for database merging opened successfully" << std::endl;
 
-	while(!in2.eof())
+	//Read in the first data point
+	
+
+	while(in2 >> gene.taxonomy >> gene.sequence)
 	{
 		//Append new read to uniques linked list if unique
 		if(checkUniques(uniques, gene))
@@ -428,7 +427,6 @@ void readList(std::ifstream &in1, std::string input1, std::ifstream &in2, std::s
 		{
 			addGene(repeats, gene);
 		}
-		in2 >> gene.taxonomy >> gene.sequence;
 	}
 	//close second file
 	in2.close();
