@@ -114,7 +114,7 @@ void getGBData(std::ifstream &in, Node **data, std::string input)
 				species = species.substr(species.find_first_not_of(' '),species.length() - 1);
 			}
 
-			while(tax[tax.length()-1] != '.')
+			do
 			{
 
 				in >> temp;
@@ -139,7 +139,7 @@ void getGBData(std::ifstream &in, Node **data, std::string input)
 				//If the program reads to far into the next field
 				else if (temp == "REFERENCE") 
 				{
-					tax[tax.length()-1] = '.';
+					tax.back() = '.';
 				}
 				//Add next member of taxonomy
 				else
@@ -147,9 +147,10 @@ void getGBData(std::ifstream &in, Node **data, std::string input)
 					tax += temp;
 				}   
 			}
+			while(tax[tax.length()-1] != '.');
 
 			//change period at end of genus to semicolon
-			tax[tax.length() - 1] = ';';
+			tax.back() = ';';
 			//concatenate species onto string of taxonomix data
 			tax += species + ";";
 			//change spaces and any other punctuation to underscore character
