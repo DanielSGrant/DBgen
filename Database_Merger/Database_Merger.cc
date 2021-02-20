@@ -37,13 +37,12 @@ struct Node
 };
 
 void addGene(struct Node **, Gene);
-void writeList(struct Node *node, std::ofstream &, std::ofstream &, std::string, std::string);
 void deleteList(Node**);
-void DatabaseMaker(std::string, std::string, std::string);
 void DatabaseMerge(std::string, std::string, std::string, std::string);
 void readList(std::ifstream &, std::string, std::ifstream &, std::string, Node **, Node **);
 bool checkUniques(Node**, const Gene &);
 void writeList(struct Node *, std::ofstream &, std::string, struct Node *, std::ofstream &, std::string);
+void displayList(struct Node *);
 
 const int ASCII9 = static_cast <int> ('9');
 
@@ -67,6 +66,7 @@ void DatabaseMerge(std::string inputFile1, std::string inputFile2, std::string o
 	
 	//Reading in files and creating linked lists
 	readList(in1, inputFile1, in2, inputFile2, &uniques, &repeats);
+
 	//Writing files to unique and repeat files
 	writeList(uniques, out1, outputFile1, repeats, out2, outputFile2);
 	//Deleting lists and freeing allocated memory
@@ -238,20 +238,20 @@ void writeList(struct Node *uniques, std::ofstream &out1, std::string output1, s
    //traverse the list to print each node to uniques output file
    while (uniques != NULL)
    {
-   		out1 << ">" << uniques->gene.taxonomy << std::endl << uniques->gene.sequence << std::endl;
+   		out1 << uniques->gene.taxonomy << std::endl << uniques->gene.sequence << std::endl;
    		uniques = uniques->next;
 		
    }
+ 
 
    //close uniques output file
    out1.close();
-
-	//traverse the list to print each node to repeats output file
+   std::cout << "Finished writing uniques, output file closed" << std::endl;
+	// //traverse the list to print each node to repeats output file
    while (repeats != NULL)
    {
-   		out2 << ">" << uniques->gene.taxonomy << std::endl << uniques->gene.sequence << std::endl;
-   		repeats = repeats->next;
-		
+      out2 << repeats->gene.taxonomy << std::endl << repeats->gene.sequence << std::endl;
+      repeats = repeats->next;
    }
  
  	//close repeats output file
@@ -286,16 +286,15 @@ void deleteList(Node** head)
 
 
 //Function for displaying a linked list, for testing purposes only
-// void displayList(struct Node *node)
-// {
-//    //traverse the list to display each node
-//    while (node != NULL)
-//    {
-//       std::cout << node->gene.taxonomy << std::endl 
-//       << node->gene.sequence << std::endl;
-//       node = node->next;
-//    }
+void displayList(struct Node *node)
+{
+   //traverse the list to display each node
+   while (node != NULL)
+   {
+      std::cout << node->gene.taxonomy << std::endl;
+      node = node->next;
+   }
  
-// 	if(node== NULL)
-// 	std::cout << "Finished Displaying List" << std::endl; 
-// } 
+	if(node== NULL)
+	std::cout << "Finished Displaying List" << std::endl; 
+} 
