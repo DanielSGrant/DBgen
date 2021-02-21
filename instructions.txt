@@ -1,0 +1,40 @@
+[Windows]
+
+[Install]
+CMake
+https://cmake.org/
+
+Visual C++ Redistributable
+https://support.microsoft.com/en-us/topic/the-latest-supported-visual-c-downloads-2647da03-1eea-4433-9aff-95f26a218cc0
+
+[Command]
+$ cmake -S . -B build/debug && cmake --build build/debug --config Debug && cmake -S . -B build/release && cmake --build build/release --config Release
+
+
+
+[Ubuntu/Lubuntu]
+
+[Install]
+$ sudo apt install libgtk-3-dev libwxgtk-media3.0-dev gettext cmake git
+
+[Command]
+$ chmod +x compile.sh
+$ mkdir -p $PWD/build && cmake .. && cmake --build . && $PWD/build/project/Build/core/main
+
+[Error]
+g_dbus_proxy_new: assertion 'G_IS_DBUS_CONNECTION (connection)' failed
+$ sudo apt purge fcitx-module-dbus
+
+
+
+[macOS: Catalina]
+
+[Install]
+- Xcode
+- Homebrew
+
+$ brew install cmake wxmac
+
+[Command]
+$ chmod +x compile.sh
+$ mkdir -p $PWD/build && cmake -S . -B build && cmake --build build && $PWD/build/project/Build/core/main
