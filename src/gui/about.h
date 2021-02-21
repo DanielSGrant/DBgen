@@ -12,7 +12,7 @@ public:
     ~About();
 
 public:
-    void OnExit(wxCommandEvent &event);
+    void OnExit(wxCommandEvent&);
 
 private:
     wxPanel

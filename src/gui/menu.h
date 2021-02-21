@@ -12,9 +12,10 @@ public:
     ~Menu();
 
 public:
-    void OnPreferences(wxCommandEvent &event);
-    void OnExit(wxCommandEvent &event);
-    void OnAbout(wxCommandEvent &event);
+    void OnReload(wxCommandEvent&);
+    void OnPreferences(wxCommandEvent&);
+    void OnExit(wxCommandEvent&);
+    void OnAbout(wxCommandEvent&);
 
 private:
     wxMenu
@@ -24,7 +25,8 @@ private:
     wxMenuItem
     *menuitem1,
     *menuitem2,
-    *menuitem3;
+    *menuitem3,
+    *menuitem4;
 
     wxDECLARE_EVENT_TABLE();
 };

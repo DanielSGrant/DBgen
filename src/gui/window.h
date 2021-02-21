@@ -18,6 +18,7 @@ public:
     void OnMake(wxCommandEvent&);
     void OnMerge(wxCommandEvent&);
     void OnExit(wxCommandEvent&);
+    void OnKeyDown(wxKeyEvent&);
 
 private:
     wxMenuBar *menubar;

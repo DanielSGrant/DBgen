@@ -12,7 +12,7 @@ enum
     ID_AUTOSCAN
 };
 
-DECLARE_APP(App)
+DECLARE_APP(App);
 
 wxBEGIN_EVENT_TABLE(Preferences, wxFrame)
     EVT_BUTTON(ID_SAVE, Preferences::OnSave)

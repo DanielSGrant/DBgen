@@ -14,9 +14,9 @@ public:
 
 public:
     void OnLoad();
-    void OnAutoscan(wxCommandEvent &event);
-    void OnSave(wxCommandEvent &event);
-    void OnExit(wxCommandEvent &event);
+    void OnAutoscan(wxCommandEvent&);
+    void OnSave(wxCommandEvent&);
+    void OnExit(wxCommandEvent&);
 
 private:
     wxPanel

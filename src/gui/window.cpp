@@ -1,5 +1,5 @@
 // @TODO:
-// - Run database functions in different threads
+// - Validation on the database functions
 // - Handle custom events for wxDirPicker to prevent typing
 // - Store the preferences in the application/globally?
 // - Add comments
@@ -14,9 +14,11 @@
 #endif
 
 #include <filesystem>
+#include <thread>
 #include <vector>
 
 #include "about.h"
+#include "app.h"
 #include "ini.h"
 #include "listbox.h"
 #include "make.h"
@@ -37,12 +39,15 @@ enum
     ID_MERGE
 };
 
+DECLARE_APP(App);
+
 wxBEGIN_EVENT_TABLE(Window, wxFrame)
     EVT_MENU(wxID_ANY, Window::OnExit)
     EVT_BUTTON(ID_BROWSE, Window::OnBrowse)
     EVT_BUTTON(ID_MAKE, Window::OnMake)
     EVT_BUTTON(ID_MERGE, Window::OnMerge)
     EVT_TIMER(-1, Window::OnTimer)
+    EVT_CHAR_HOOK(Window::OnKeyDown)
 wxEND_EVENT_TABLE()
 
 Window::Window() :
@@ -86,7 +91,11 @@ Window::Window() :
     int count = listbox->GetCount();
 
     if (count > 0)
+    {
         listbox->SetSelection(0);
+        listbox->SetFocus();
+    }
+
 
     browse_button = new wxButton(
         this,
@@ -213,7 +222,8 @@ void Window::OnMake(wxCommandEvent &WXUNUSED(event))
             fs::path input = path;
             fs::path output = (out / filename);
 
-            DatabaseMaker(input, output);
+            std::thread make(DatabaseMaker, input, output);
+            make.detach();
         }
 
         timer->StartOnce(3500);
@@ -250,7 +260,8 @@ void Window::OnMerge(wxCommandEvent &WXUNUSED(event))
         fs::path input2 = list[1].ToStdString();
         fs::path output = out;
 
-        DatabaseMerge(input1, input2, out);
+        std::thread merge(DatabaseMerge, input1, input2, out);
+        merge.detach();
 
         timer->StartOnce(3500);
         text->Show();
@@ -260,4 +271,15 @@ void Window::OnMerge(wxCommandEvent &WXUNUSED(event))
 void Window::OnTimer(wxTimerEvent &event)
 {
     text->Hide();
+}
+
+void Window::OnKeyDown(wxKeyEvent &event)
+{
+    if ((int)event.GetKeyCode() == WXK_F5)
+    {
+        wxGetApp().SetRestart(true);
+        wxGetApp().ExitMainLoop();
+    }
+
+    event.Skip();
 }

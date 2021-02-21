@@ -12,7 +12,7 @@ public:
     ~Listbox();
 
 public:
-    void OnKeyDown(wxKeyEvent &event);
+    void OnKeyDown(wxKeyEvent&);
 
 private:
     wxDECLARE_EVENT_TABLE();
