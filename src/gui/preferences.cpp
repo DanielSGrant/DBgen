@@ -1,3 +1,4 @@
+#include "app.h"
 #include "ini.h"
 #include "preferences.h"
 #include "utilities.h"
@@ -11,13 +12,15 @@ enum
     ID_AUTOSCAN
 };
 
-wxBEGIN_EVENT_TABLE(PreferencesFrame, wxFrame)
-    EVT_BUTTON(ID_SAVE, PreferencesFrame::OnSave)
-    EVT_BUTTON(ID_CANCEL, PreferencesFrame::OnExit)
-    EVT_CHECKBOX(ID_AUTOSCAN, PreferencesFrame::OnAutoscan)
+DECLARE_APP(App)
+
+wxBEGIN_EVENT_TABLE(Preferences, wxFrame)
+    EVT_BUTTON(ID_SAVE, Preferences::OnSave)
+    EVT_BUTTON(ID_CANCEL, Preferences::OnExit)
+    EVT_CHECKBOX(ID_AUTOSCAN, Preferences::OnAutoscan)
 wxEND_EVENT_TABLE()
 
-PreferencesFrame::PreferencesFrame(wxWindow *parent) :
+Preferences::Preferences(wxWindow *parent) :
     wxFrame(
         parent,
         wxID_ANY,
@@ -262,15 +265,15 @@ PreferencesFrame::PreferencesFrame(wxWindow *parent) :
     this->SetSizer(sizer1);
     this->Layout();
     this->Centre(wxBOTH);
-    this->Load();
+    this->OnLoad();
 }
 
-PreferencesFrame::~PreferencesFrame()
+Preferences::~Preferences()
 {
 
 }
 
-void PreferencesFrame::Load()
+void Preferences::OnLoad()
 {
     std::string path = get_base_path();
 
@@ -322,7 +325,7 @@ void PreferencesFrame::Load()
     }
 }
 
-void PreferencesFrame::OnAutoscan(wxCommandEvent &event)
+void Preferences::OnAutoscan(wxCommandEvent &event)
 {
     bool checked = checkbox1->GetValue();
 
@@ -337,12 +340,7 @@ void PreferencesFrame::OnAutoscan(wxCommandEvent &event)
     }
 }
 
-void PreferencesFrame::OnExit(wxCommandEvent &event)
-{
-    Close(true);
-}
-
-void PreferencesFrame::OnSave(wxCommandEvent &event)
+void Preferences::OnSave(wxCommandEvent &event)
 {
     std::string base = get_base_path();
 
@@ -381,7 +379,10 @@ void PreferencesFrame::OnSave(wxCommandEvent &event)
     {
         fs::path directory = output;
         fs::create_directory(directory);
+
         Close(true);
+        wxGetApp().SetRestart(true);
+        wxGetApp().ExitMainLoop();
     }
     else
     {
@@ -392,3 +393,9 @@ void PreferencesFrame::OnSave(wxCommandEvent &event)
         );
     }
 }
+
+void Preferences::OnExit(wxCommandEvent &event)
+{
+    Close(true);
+}
+

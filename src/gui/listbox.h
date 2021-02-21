@@ -12,6 +12,8 @@ public:
     ~Listbox();
 
 public:
-    void Create();
     void OnKeyDown(wxKeyEvent &event);
+
+private:
+    wxDECLARE_EVENT_TABLE();
 };

@@ -1,3 +1,4 @@
+#pragma once
 #include <wx/wxprec.h>
 
 #ifndef WX_PRECOMP
@@ -12,11 +13,11 @@ public:
     ~Window();
 
 public:
-    void OnExit(wxCommandEvent &event);
-    void Browse(wxCommandEvent &event);
-    void Make(wxCommandEvent &event);
-    void Merge(wxCommandEvent &event);
-    void OnTimer(wxTimerEvent &event);
+    void OnTimer(wxTimerEvent&);
+    void OnBrowse(wxCommandEvent&);
+    void OnMake(wxCommandEvent&);
+    void OnMerge(wxCommandEvent&);
+    void OnExit(wxCommandEvent&);
 
 private:
     wxMenuBar *menubar;

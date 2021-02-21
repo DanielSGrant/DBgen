@@ -20,16 +20,6 @@ wxEND_EVENT_TABLE()
 
 Menu::Menu() : wxMenuBar()
 {
-    this->Create();
-}
-
-Menu::~Menu()
-{
-
-}
-
-void Menu::Create()
-{
     menu1 = new wxMenu();
     menu2 = new wxMenu();
 
@@ -69,10 +59,21 @@ void Menu::Create()
     this->Append(menu2, wxT("Help"));
 }
 
+Menu::~Menu()
+{
+
+}
+
 void Menu::OnPreferences(wxCommandEvent &event)
 {
-    PreferencesFrame *preferences = new PreferencesFrame((wxWindow *) GetParent());
+    Preferences *preferences = new Preferences((wxWindow *) GetParent());
     preferences->Show();
+}
+
+void Menu::OnAbout(wxCommandEvent &event)
+{
+    About *about = new About((wxWindow *) GetParent());
+    about->Show();
 }
 
 void Menu::OnExit(wxCommandEvent &event)
@@ -82,10 +83,4 @@ void Menu::OnExit(wxCommandEvent &event)
         wxEVT_COMMAND_MENU_SELECTED,
         wxCommandEventHandler(Window::OnExit)
     );
-}
-
-void Menu::OnAbout(wxCommandEvent &event)
-{
-    AboutFrame *about = new AboutFrame((wxWindow *) GetParent());
-    about->Show();
 }

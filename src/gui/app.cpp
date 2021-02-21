@@ -18,17 +18,15 @@ wxIMPLEMENT_APP(App);
 
 App::App()
 {
-
-}
-
-App::~App()
-{
-
+    this->OnBootstrap();
 }
 
 bool App::OnInit()
 {
-    this->Bootstrap();
+    restart = false;
+
+    if (!wxApp::OnInit())
+        return false;
 
     window = new Window();
     window->Show(true);
@@ -36,7 +34,7 @@ bool App::OnInit()
     return true;
 }
 
-void App::Bootstrap()
+void App::OnBootstrap()
 {
     std::string path = get_base_path();
 

@@ -6,17 +6,17 @@
 #endif
 
 
-class PreferencesFrame : public wxFrame
+class Preferences : public wxFrame
 {
 public:
-    PreferencesFrame(wxWindow*);
-    ~PreferencesFrame();
+    Preferences(wxWindow*);
+    ~Preferences();
 
 public:
-    void Load();
+    void OnLoad();
     void OnAutoscan(wxCommandEvent &event);
-    void OnExit(wxCommandEvent &event);
     void OnSave(wxCommandEvent &event);
+    void OnExit(wxCommandEvent &event);
 
 private:
     wxPanel

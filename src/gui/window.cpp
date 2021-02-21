@@ -1,7 +1,6 @@
 // @TODO:
 // - Run database functions in different threads
 // - Handle custom events for wxDirPicker to prevent typing
-// - Restart the application when the user saves preferences
 // - Store the preferences in the application/globally?
 // - Add comments
 
@@ -40,9 +39,9 @@ enum
 
 wxBEGIN_EVENT_TABLE(Window, wxFrame)
     EVT_MENU(wxID_ANY, Window::OnExit)
-    EVT_BUTTON(ID_BROWSE, Window::Browse)
-    EVT_BUTTON(ID_MAKE, Window::Make)
-    EVT_BUTTON(ID_MERGE, Window::Merge)
+    EVT_BUTTON(ID_BROWSE, Window::OnBrowse)
+    EVT_BUTTON(ID_MAKE, Window::OnMake)
+    EVT_BUTTON(ID_MERGE, Window::OnMerge)
     EVT_TIMER(-1, Window::OnTimer)
 wxEND_EVENT_TABLE()
 
@@ -84,6 +83,10 @@ Window::Window() :
     text->Hide();
 
     listbox = new Listbox(this);
+    int count = listbox->GetCount();
+
+    if (count > 0)
+        listbox->SetSelection(0);
 
     browse_button = new wxButton(
         this,
@@ -140,7 +143,7 @@ void Window::OnExit(wxCommandEvent &event)
     event.Skip();
 }
 
-void Window::Browse(wxCommandEvent &WXUNUSED(event))
+void Window::OnBrowse(wxCommandEvent &WXUNUSED(event))
 {
     std::string base = get_base_path();
 
@@ -178,7 +181,7 @@ void Window::Browse(wxCommandEvent &WXUNUSED(event))
     }
 }
 
-void Window::Make(wxCommandEvent &WXUNUSED(event))
+void Window::OnMake(wxCommandEvent &WXUNUSED(event))
 {
     wxArrayString list = listbox->GetStrings();
 
@@ -218,7 +221,7 @@ void Window::Make(wxCommandEvent &WXUNUSED(event))
     }
 }
 
-void Window::Merge(wxCommandEvent &WXUNUSED(event))
+void Window::OnMerge(wxCommandEvent &WXUNUSED(event))
 {
     wxArrayString list = listbox->GetStrings();
 

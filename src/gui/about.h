@@ -5,11 +5,11 @@
 #endif
 
 
-class AboutFrame : public wxFrame
+class About : public wxFrame
 {
 public:
-    AboutFrame(wxWindow*);
-    ~AboutFrame();
+    About(wxWindow*);
+    ~About();
 
 public:
     void OnExit(wxCommandEvent &event);

@@ -3,6 +3,10 @@
 #include "window.h"
 
 
+wxBEGIN_EVENT_TABLE(Listbox, wxListBox)
+    EVT_CHAR_HOOK(Listbox::OnKeyDown)
+wxEND_EVENT_TABLE()
+
 Listbox::Listbox(wxWindow *parent) :
     wxListBox(
         parent,
@@ -13,16 +17,6 @@ Listbox::Listbox(wxWindow *parent) :
         NULL,
         wxLB_EXTENDED | wxLB_SORT | wxCLIP_CHILDREN | wxHSCROLL | wxVSCROLL
     )
-{
-    this->Create();
-}
-
-Listbox::~Listbox()
-{
-
-}
-
-void Listbox::Create()
 {
     std::vector<std::string> path = autoscan();
 
@@ -35,8 +29,11 @@ void Listbox::Create()
         // wxString path = Ellipsize(item, context, wxELLIPSIZE_START, width - 10, wxELLIPSIZE_FLAGS_NONE);
         this->Append(item);
     }
+}
 
-    this->Bind(wxEVT_CHAR_HOOK, &Listbox::OnKeyDown, this);
+Listbox::~Listbox()
+{
+
 }
 
 void Listbox::OnKeyDown(wxKeyEvent &event)

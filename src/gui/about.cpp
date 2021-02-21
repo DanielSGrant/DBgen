@@ -7,11 +7,11 @@ enum
     ID_OK
 };
 
-wxBEGIN_EVENT_TABLE(AboutFrame, wxFrame)
-    EVT_BUTTON(ID_OK, AboutFrame::OnExit)
+wxBEGIN_EVENT_TABLE(About, wxFrame)
+    EVT_BUTTON(ID_OK, About::OnExit)
 wxEND_EVENT_TABLE()
 
-AboutFrame::AboutFrame(wxWindow *parent) :
+About::About(wxWindow *parent) :
     wxFrame(
         parent,
         wxID_ANY,
@@ -250,12 +250,12 @@ AboutFrame::AboutFrame(wxWindow *parent) :
     this->Centre(wxBOTH);
 }
 
-AboutFrame::~AboutFrame()
+About::~About()
 {
 
 }
 
-void AboutFrame::OnExit(wxCommandEvent &event)
+void About::OnExit(wxCommandEvent &event)
 {
     Close(true);
 }

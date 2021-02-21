@@ -11,14 +11,25 @@ class App : public wxApp
 {
 public:
     App();
-    ~App();
 
 private:
-    void Bootstrap();
+    void OnBootstrap();
 
-    Window*
-    window = nullptr;
+    Window
+    *window = nullptr;
 
 public:
     virtual bool OnInit();
+    void SetRestart(bool flag) { restart = flag; }
+
+protected:
+    bool restart;
+
+    virtual ~App()
+    {
+        if (restart)
+        {
+            wxExecute(argv[0]);
+        }
+    };
 };
