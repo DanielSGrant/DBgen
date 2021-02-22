@@ -36,19 +36,13 @@ bool App::OnInit()
 
 void App::OnBootstrap()
 {
-    std::string path = get_base_path();
-
-    fs::path preferences = path;
-    preferences /= "preferences.ini";
+    std::string base = get_base_path();
+    fs::path preferences = base / fs::path("preferences.ini");
 
     if (!exists(preferences))
     {
-        fs::path input = path;
-        input /= "input";
-
-        fs::path output = path;
-        output /= "output";
-
+        fs::path input = base / fs::path("input");
+        fs::path output = base / fs::path("output");
         set_default_preferences(input, output, preferences);
     }
 
@@ -56,11 +50,8 @@ void App::OnBootstrap()
     mINI::INIStructure ini;
     file.read(ini);
 
-    std::string &in = ini["directory"]["input"];
-    std::string &out = ini["directory"]["output"];
-
-    fs::path input = in;
-    fs::path output = out;
+    fs::path input = fs::path(ini["directory"]["input"]);
+    fs::path output = fs::path(ini["directory"]["output"]);
 
     fs::create_directories(input);
     fs::create_directories(output);

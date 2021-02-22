@@ -58,19 +58,15 @@ void set_default_preferences(fs::path input, fs::path output, fs::path preferenc
 std::vector<std::string> autoscan()
 {
     std::string base = get_base_path();
-
-    fs::path preferences = base;
-    preferences /= "preferences.ini";
+    fs::path preferences = base / fs::path("preferences.ini");
 
     mINI::INIFile file(preferences.string());
     mINI::INIStructure ini;
     file.read(ini);
 
-    std::string &in = ini["directory"]["input"];
+    fs::path input = fs::path(ini["directory"]["input"]);
     std::string &autoscan = ini["options"]["autoscan"];
     std::string &recursive = ini["options"]["recursive"];
-
-    fs::path input = in;
 
     std::vector<std::string> files;
 

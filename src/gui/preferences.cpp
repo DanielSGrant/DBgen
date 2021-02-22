@@ -12,8 +12,6 @@ enum
     ID_AUTOSCAN
 };
 
-DECLARE_APP(App);
-
 wxBEGIN_EVENT_TABLE(Preferences, wxFrame)
     EVT_BUTTON(ID_SAVE, Preferences::OnSave)
     EVT_BUTTON(ID_CANCEL, Preferences::OnExit)
@@ -275,10 +273,8 @@ Preferences::~Preferences()
 
 void Preferences::OnLoad()
 {
-    std::string path = get_base_path();
-
-    fs::path preferences = path;
-    preferences /= "preferences.ini";
+    std::string base = get_base_path();
+    fs::path preferences = base / fs::path("preferences.ini");
 
     mINI::INIFile file(preferences.string());
     mINI::INIStructure ini;
@@ -343,9 +339,7 @@ void Preferences::OnAutoscan(wxCommandEvent &event)
 void Preferences::OnSave(wxCommandEvent &event)
 {
     std::string base = get_base_path();
-
-    fs::path preferences = base;
-    preferences /= "preferences.ini";
+    fs::path preferences = base / fs::path("preferences.ini");
 
     mINI::INIFile file(preferences.string());
     mINI::INIStructure ini;

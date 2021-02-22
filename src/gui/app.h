@@ -18,10 +18,6 @@ private:
     Window
     *window = nullptr;
 
-public:
-    virtual bool OnInit();
-    void SetRestart(bool flag) { restart = flag; }
-
 protected:
     bool restart;
 
@@ -32,4 +28,10 @@ protected:
             wxExecute(argv[0]);
         }
     };
+
+public:
+    virtual bool OnInit();
+    void SetRestart(bool flag) { restart = flag; }
 };
+
+DECLARE_APP(App);

@@ -1,5 +1,5 @@
 // @TODO:
-// - Validation on the database functions
+// - Use wxThread?
 // - Handle custom events for wxDirPicker to prevent typing
 // - Store the preferences in the application/globally?
 // - Add comments
@@ -38,8 +38,6 @@ enum
     ID_MAKE,
     ID_MERGE
 };
-
-DECLARE_APP(App);
 
 wxBEGIN_EVENT_TABLE(Window, wxFrame)
     EVT_MENU(wxID_ANY, Window::OnExit)
@@ -155,20 +153,17 @@ void Window::OnExit(wxCommandEvent &event)
 void Window::OnBrowse(wxCommandEvent &WXUNUSED(event))
 {
     std::string base = get_base_path();
-
-    fs::path preferences = base;
-    preferences /= "preferences.ini";
+    fs::path preferences = base / fs::path("preferences.ini");
 
     mINI::INIFile file(preferences.string());
     mINI::INIStructure ini;
     file.read(ini);
 
-    std::string &input = ini["directory"]["output"];
-    wxString directory(input);
+    wxString input = wxString(ini["directory"]["output"]);
 
     wxFileDialog *OpenDialog = new wxFileDialog(
         this, _("Choose a file to open"),
-        directory, wxEmptyString,
+        input, wxEmptyString,
         _("Genbank, Fasta (*.gb;*.fasta)|*.gb;*.fasta"),
         wxFD_OPEN|wxFD_MULTIPLE, wxDefaultPosition
     );
@@ -205,25 +200,34 @@ void Window::OnMake(wxCommandEvent &WXUNUSED(event))
     else
     {
         std::string base = get_base_path();
-
-        fs::path preferences = base;
-        preferences /= "preferences.ini";
+        fs::path preferences = base / fs::path("preferences.ini");
 
         mINI::INIFile file(preferences.string());
         mINI::INIStructure ini;
         file.read(ini);
 
-        std::string &out = ini["directory"]["output"];
-
         for (unsigned int i = 0; i < list.size(); i++)
         {
-            fs::path path = list[i].ToStdString();
-            fs::path filename = path.filename();
-            fs::path input = path;
-            fs::path output = (out / filename);
+            fs::path input = list[i].ToStdString();
 
-            std::thread make(DatabaseMaker, input, output);
-            make.detach();
+            if (input.extension() == ".gb")
+            {
+                fs::path filename = input.filename();
+                fs::path output = fs::path(ini["directory"]["output"]) / fs::path(filename);
+
+                std::thread make(DatabaseMaker, input, output);
+                make.join();
+            }
+            else
+            {
+                wxMessageBox(
+                    "Please use a file with a .gb extension.",
+                    "Warning",
+                    wxOK | wxICON_EXCLAMATION | wxCENTRE
+                );
+
+                return;
+            }
         }
 
         timer->StartOnce(3500);
@@ -245,26 +249,48 @@ void Window::OnMerge(wxCommandEvent &WXUNUSED(event))
     }
     else
     {
-        std::string base = get_base_path();
+        size_t count = list.GetCount();
 
-        fs::path preferences = base;
-        preferences /= "preferences.ini";
+        if (count == 2)
+        {
+            std::string base = get_base_path();
+            fs::path preferences = base / fs::path("preferences.ini");
 
-        mINI::INIFile file(preferences.string());
-        mINI::INIStructure ini;
-        file.read(ini);
+            mINI::INIFile file(preferences.string());
+            mINI::INIStructure ini;
+            file.read(ini);
 
-        std::string &out = ini["directory"]["output"];
+            fs::path input1 = list[0].ToStdString();
+            fs::path input2 = list[1].ToStdString();
 
-        fs::path input1 = list[0].ToStdString();
-        fs::path input2 = list[1].ToStdString();
-        fs::path output = out;
+            if (input1.extension() == ".fasta" && input2.extension() == ".fasta")
+            {
+                fs::path output = fs::path(ini["directory"]["output"]);
+                std::thread merge(DatabaseMerge, input1, input2, output);
+                merge.join();
+            }
+            else
+            {
+                wxMessageBox(
+                    "Please use a file with a .fasta extension.",
+                    "Warning",
+                    wxOK | wxICON_EXCLAMATION | wxCENTRE
+                );
 
-        std::thread merge(DatabaseMerge, input1, input2, out);
-        merge.detach();
+                return;
+            }
 
-        timer->StartOnce(3500);
-        text->Show();
+            timer->StartOnce(3500);
+            text->Show();
+        }
+        else
+        {
+            wxMessageBox(
+                "Please include two .fasta files.",
+                "Warning",
+                wxOK | wxICON_EXCLAMATION | wxCENTRE
+            );
+        }
     }
 }
 

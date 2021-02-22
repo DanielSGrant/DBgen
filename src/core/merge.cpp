@@ -72,13 +72,16 @@ void DatabaseMerge(fs::path input1, fs::path input2, fs::path output)
     fs::path filename2 = input2.stem();
     fs::path extension2 = input2.extension();
 
+    fs::path unique = output / fs::path("merged_uniques.fasta");
+    fs::path repeat = output / fs::path("merged_repeats.fasta");
+
     // Input
     std::string path1 = (base1 / filename1).string() + extension1.string();
     std::string path2 = (base2 / filename2).string() + extension2.string();
 
     // Output
-    std::string path3 = (output / filename1).string() + "_uniques" + extension1.string();
-    std::string path4 = (output / filename2).string() + "_repeats" + extension2.string();
+    std::string path3 = unique.string();
+    std::string path4 = repeat.string();
 
     // Reading in files and creating linked lists
     readList(&uniques, &repeats, path1, path2);

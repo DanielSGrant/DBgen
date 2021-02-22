@@ -14,8 +14,6 @@ enum
     ID_ABOUT
 };
 
-DECLARE_APP(App);
-
 wxBEGIN_EVENT_TABLE(Menu, wxMenuBar)
     EVT_MENU(ID_RELOAD, Menu::OnReload)
     EVT_MENU(ID_PREFERENCES, Menu::OnPreferences)
