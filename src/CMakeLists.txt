@@ -37,7 +37,7 @@ set(
     ${GUI}/app.cpp
     ${GUI}/listbox.cpp
     ${GUI}/menu.cpp
-    ${GUI}/preferences.cpp
+    ${GUI}/options.cpp
     ${GUI}/window.cpp
     ${LIB}/mini/ini.h
     ${LIB}/whereami/whereami.c

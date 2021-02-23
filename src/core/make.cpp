@@ -35,30 +35,30 @@ namespace fs = std::filesystem;
 
 struct Gene
 {
-    std::string taxonomy;
-    // struct Sequence sequence;
-    std::string sequence;
+	std::string taxonomy;
+	// struct Sequence sequence;
+	std::string sequence;
 };
 
 struct Node
 {
-    struct Gene gene;
-    struct Node *next;
+	struct Gene gene;
+	struct Node *next;
 };
 
-const int ASCII9 = static_cast<int> ('9');
+const int ASCII9 = static_cast<int>('9');
 
 
 void DatabaseMaker(fs::path input, fs::path output)
 {
 	struct Node *head = NULL;
-
+	
 	// Pull information from .gb file
 	getGBData(&head, input);
-
+	
 	// Write valid and invalid data to output files
 	writeList(head, output);
-
+	
 	// Free allocated memory
 	deleteList(&head);
 }
@@ -77,44 +77,44 @@ void DatabaseMaker(fs::path input, fs::path output)
 void getGBData(Node **data, fs::path input)
 {
 	std::ifstream in;
-
+	
 	fs::path base = input.parent_path();
 	fs::path filename = input.stem();
 	fs::path extension = input.extension();
 	std::string file = (base / filename).string() + extension.string();
-
+	
 	in.open(file);
-
+	
 	// Variable declaration
 	std::string temp, tax, species, sequence;
 	Gene tempGene;
 	bool write;
-
+	
 	while (in >> temp)
 	{
 		write = true;
-
+		
 		// Reset tax to empty string for next round of reads
 		tax = "";
 		sequence = "";
-
+		
 		// Read until you hit ORGANISM. then read in taxonomy
 		if (temp == "ORGANISM")
 		{
 			// Get full line for species
 			getline(in, species);
-
+			
 			// Remove unwanted spaces from species name if they exist
 			if (species[0] == ' ')
 			{
 				species = species.substr(species.find_first_not_of(' '), species.length() - 1);
 			}
-
+			
 			//Read in taxonomy
 			do
 			{
 				in >> temp;
-
+				
 				// Remove unwanted group and terms from taxonomy if present
 				if (temp.find("group") != std::string::npos)
 				{
@@ -142,29 +142,30 @@ void getGBData(Node **data, fs::path input)
 				{
 					tax += temp;
 				}
-
-			} while (tax[tax.length() - 1] != '.');
-
+				
+			}
+			while (tax[tax.length() - 1] != '.');
+			
 			// Change period at end of genus to semicolon
 			tax.back() = ';';
-
+			
 			// Concatenate species onto string of taxonomix data
 			tax += species + ";";
-
+			
 			// Change spaces and any other punctuation to underscore character
-			for (int i = 0; i < static_cast<int> (tax.length()); i++)
+			for (int i = 0; i < static_cast<int>(tax.length()); i++)
 			{
 				if (tax[i] == '.')
 				{
-					tax.erase(i,1);
+					tax.erase(i, 1);
 				}
-
+				
 				if (tax[i] == ' ' || tax[i] == '-' || tax[i] == ':' || tax[i] == '=')
 				{
 					tax[i] = '_';
 				}
 			}
-
+			
 			// Read until sequence data starts or you hit the end of that data point
 			while (temp != "ORIGIN" && in >> temp)
 			{
@@ -173,27 +174,28 @@ void getGBData(Node **data, fs::path input)
 					write = false;
 					break;
 				}
-
+				
 			}
-
+			
 			// If you reach ORIGIN, read in the sequence data
 			if (temp == "ORIGIN")
 			{
 				in >> temp;
-
+				
 				do
 				{
-					if (static_cast<int> (temp[0]) > ASCII9 && (temp[0] == 'a' || temp[0] == 'c' ||
-						temp[0] == 'g' || temp[0] == 't' || temp[0] == 'n'))
+					if (static_cast<int>(temp[0]) > ASCII9 && (temp[0] == 'a' || temp[0] == 'c' ||
+							temp[0] == 'g' || temp[0] == 't' || temp[0] == 'n'))
 					{
 						sequence += temp;
 					}
-
+					
 					in >> temp;
-
-				} while (temp != "//");
+					
+				}
+				while (temp != "//");
 			}
-
+			
 			// Write data to array if new data is available
 			if (write)
 			{
@@ -203,7 +205,7 @@ void getGBData(Node **data, fs::path input)
 			}
 		}
 	}
-
+	
 	// Close input file
 	in.close();
 }
@@ -220,32 +222,32 @@ void getGBData(Node **data, fs::path input)
 
 inline void addGene(struct Node **head, Gene Gene_data)
 {
-    // Create and allocate new node
-    struct Node* newNode = new Node;
-    struct Node* last = *head;
-
-    // Assign data to the node
-    newNode->gene = Gene_data;
-
-    // Make next pointer of new node NULL
-    newNode->next = NULL;
-
-    // If list is empty, new node becomes first node
-    if (*head == NULL)
-    {
-        *head = newNode;
-        return;
-    }
-
-    // else traverse to last node
-    while (last->next != NULL)
-    {
-        last = last->next;
-    }
-
-    // Change next of last node
-    last->next = newNode;
-    return;
+	// Create and allocate new node
+	struct Node *newNode = new Node;
+	struct Node *last = *head;
+	
+	// Assign data to the node
+	newNode->gene = Gene_data;
+	
+	// Make next pointer of new node NULL
+	newNode->next = NULL;
+	
+	// If list is empty, new node becomes first node
+	if (*head == NULL)
+	{
+		*head = newNode;
+		return;
+	}
+	
+	// else traverse to last node
+	while (last->next != NULL)
+	{
+		last = last->next;
+	}
+	
+	// Change next of last node
+	last->next = newNode;
+	return;
 }
 
 //
@@ -261,59 +263,59 @@ inline void addGene(struct Node **head, Gene Gene_data)
 
 void writeList(struct Node *node, fs::path output)
 {
-   bool isValid;
-   int count;
-
-   fs::path base = output.parent_path();
-   fs::path filename = output.stem();
-   fs::path extension = output.extension();
-
-   std::string valid_file = (base / filename).string() + "_valid.fasta";
-   std::string invalid_file = (base / filename).string() + "_invalid.fasta";
-
-   std::ofstream valid, invalid;
-   valid.open(valid_file);
-   invalid.open(invalid_file);
-
-   // Traverse the list to print each node to output file
-   while (node != NULL)
-   {
-   		// Reset variables
-   		isValid = false;
-   		count = 0;
-
-   		// Check how many entries there are for taxonomy
-   		for (int i = 0; i < static_cast<int> (node->gene.taxonomy.length()); i++)
-   		{
-   			if (node->gene.taxonomy[i] == ';')
-   			{
-   				count++;
-   			}
-   		}
-
-   		// If there are less than 8 pieces of taxonomy info it is valid
-   		if (count <= 8)
+	bool isValid;
+	int count;
+	
+	fs::path base = output.parent_path();
+	fs::path filename = output.stem();
+	fs::path extension = output.extension();
+	
+	std::string valid_file = (base / filename).string() + "_valid.fasta";
+	std::string invalid_file = (base / filename).string() + "_invalid.fasta";
+	
+	std::ofstream valid, invalid;
+	valid.open(valid_file);
+	invalid.open(invalid_file);
+	
+	// Traverse the list to print each node to output file
+	while (node != NULL)
+	{
+		// Reset variables
+		isValid = false;
+		count = 0;
+		
+		// Check how many entries there are for taxonomy
+		for (int i = 0; i < static_cast<int>(node->gene.taxonomy.length()); i++)
+		{
+			if (node->gene.taxonomy[i] == ';')
+			{
+				count++;
+			}
+		}
+		
+		// If there are less than 8 pieces of taxonomy info it is valid
+		if (count <= 8)
 		{
 			isValid = true;
 		}
-
+		
 		// Write valids to valid output file and invalids to invalid output file
-   		if (isValid)
-   		{
-   			valid << ">" << node->gene.taxonomy << std::endl
-			<< node->gene.sequence << std::endl;
-
-   		}
-   		else
-   		{
-   			invalid << ">" << node->gene.taxonomy << std::endl
-			<< node->gene.sequence << std::endl;
-   		}
-
-   		// Move to next node
-   		node = node->next;
-   }
-
+		if (isValid)
+		{
+			valid << ">" << node->gene.taxonomy << std::endl
+				  << node->gene.sequence << std::endl;
+				  
+		}
+		else
+		{
+			invalid << ">" << node->gene.taxonomy << std::endl
+					<< node->gene.sequence << std::endl;
+		}
+		
+		// Move to next node
+		node = node->next;
+	}
+	
 	if (node == NULL)
 	{
 		return;
@@ -333,20 +335,20 @@ void writeList(struct Node *node, fs::path output)
 inline void deleteList(Node **head)
 {
 
-    // Deref to get the real head
-    Node* current = *head;
-    Node* next = NULL;
-
-    // Read until the end of list, deleting each node
-    while (current != NULL)
-    {
-        next = current->next;
-        delete current;
-        current = next;
-    }
-
-    // Deref head_ref to affect the real head back in the caller.
-    *head = NULL;
+	// Deref to get the real head
+	Node *current = *head;
+	Node *next = NULL;
+	
+	// Read until the end of list, deleting each node
+	while (current != NULL)
+	{
+		next = current->next;
+		delete current;
+		current = next;
+	}
+	
+	// Deref head_ref to affect the real head back in the caller.
+	*head = NULL;
 }
 
 // // A function for displaying a linked list. Testing purposes only
