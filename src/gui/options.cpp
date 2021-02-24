@@ -29,7 +29,7 @@ Options::Options(wxWindow *parent) :
 	)
 {
 	this->SetSizeHints(wxDefaultSize, wxDefaultSize);
-
+	
 	wxBoxSizer *sizer1;
 	wxBoxSizer *sizer2;
 	wxBoxSizer *sizer3;
@@ -39,7 +39,7 @@ Options::Options(wxWindow *parent) :
 	wxBoxSizer *sizer7;
 	wxBoxSizer *sizer8;
 	wxBoxSizer *sizer9;
-
+	
 	sizer1 = new wxBoxSizer(wxVERTICAL);
 	sizer2 = new wxBoxSizer(wxVERTICAL);
 	sizer3 = new wxBoxSizer(wxVERTICAL);
@@ -49,7 +49,7 @@ Options::Options(wxWindow *parent) :
 	sizer7 = new wxBoxSizer(wxVERTICAL);
 	sizer8 = new wxBoxSizer(wxVERTICAL);
 	sizer9 = new wxBoxSizer(wxHORIZONTAL);
-
+	
 	panel1 = new wxPanel(
 		this,
 		wxID_ANY,
@@ -57,7 +57,7 @@ Options::Options(wxWindow *parent) :
 		wxDefaultSize,
 		wxBORDER_SUNKEN | wxTAB_TRAVERSAL
 	);
-
+	
 	title = new wxStaticText(
 		panel1,
 		wxID_ANY,
@@ -77,7 +77,7 @@ Options::Options(wxWindow *parent) :
 			wxEmptyString
 		)
 	);
-
+	
 	title2 = new wxStaticText(
 		panel1,
 		wxID_ANY,
@@ -97,7 +97,7 @@ Options::Options(wxWindow *parent) :
 			wxEmptyString
 		)
 	);
-
+	
 	label1 = new wxStaticText(
 		panel1,
 		wxID_ANY,
@@ -117,7 +117,7 @@ Options::Options(wxWindow *parent) :
 			wxEmptyString
 		)
 	);
-
+	
 	label2 = new wxStaticText(
 		panel1,
 		wxID_ANY,
@@ -137,7 +137,7 @@ Options::Options(wxWindow *parent) :
 			wxEmptyString
 		)
 	);
-
+	
 	directory1 = new wxDirPickerCtrl(
 		panel1,
 		wxID_ANY,
@@ -156,7 +156,7 @@ Options::Options(wxWindow *parent) :
 		wxSize(400, -1),
 		wxDIRP_DEFAULT_STYLE | wxDIRP_DIR_MUST_EXIST
 	);
-
+	
 	checkbox1 = new wxCheckBox(
 		panel1,
 		ID_AUTOSCAN,
@@ -176,7 +176,7 @@ Options::Options(wxWindow *parent) :
 			wxEmptyString
 		)
 	);
-
+	
 	checkbox2 = new wxCheckBox(
 		panel1,
 		wxID_ANY,
@@ -195,7 +195,7 @@ Options::Options(wxWindow *parent) :
 			wxEmptyString
 		)
 	);
-
+	
 	checkbox3 = new wxCheckBox(
 		panel1,
 		wxID_ANY,
@@ -215,7 +215,7 @@ Options::Options(wxWindow *parent) :
 			wxEmptyString
 		)
 	);
-
+	
 	save_button = new wxButton(
 		this,
 		ID_SAVE,
@@ -224,7 +224,7 @@ Options::Options(wxWindow *parent) :
 		wxDefaultSize,
 		0
 	);
-
+	
 	cancel_button = new wxButton(
 		this,
 		ID_CANCEL,
@@ -233,7 +233,7 @@ Options::Options(wxWindow *parent) :
 		wxDefaultSize,
 		0
 	);
-
+	
 	sizer4->Add(title, 0, wxALL | wxEXPAND, 5);
 	sizer3->Add(sizer4, 0, wxALL | wxEXPAND, 5);
 	sizer5->Add(label1, 0, wxALIGN_CENTER_VERTICAL | wxALL, 5);
@@ -259,7 +259,7 @@ Options::Options(wxWindow *parent) :
 	sizer9->Add(cancel_button, 0, wxALL, 5);
 	sizer8->Add(sizer9, 0, wxEXPAND, 5);
 	sizer1->Add(sizer8, 0, wxALL | wxEXPAND, 5);
-
+	
 	this->SetSizer(sizer1);
 	this->Layout();
 	this->Centre(wxBOTH);
@@ -275,21 +275,21 @@ void Options::OnLoad()
 {
 	std::string base = get_base_path();
 	fs::path options = base / fs::path("options.ini");
-
+	
 	mINI::INIFile file(options.string());
 	mINI::INIStructure ini;
 	file.read(ini);
-
+	
 	std::string &input = ini["directory"]["input"];
 	std::string &output = ini["directory"]["output"];
-
+	
 	std::string &autoscan = ini["options"]["autoscan"];
 	std::string &recursive = ini["options"]["recursive"];
 	std::string &launch = ini["options"]["launch"];
-
+	
 	directory1->SetPath(input);
 	directory2->SetPath(output);
-
+	
 	if (autoscan == "true")
 	{
 		checkbox1->SetValue(true);
@@ -301,7 +301,7 @@ void Options::OnLoad()
 		checkbox2->SetValue(false);
 		checkbox2->Disable();
 	}
-
+	
 	if (recursive  == "true")
 	{
 		checkbox2->SetValue(true);
@@ -310,7 +310,7 @@ void Options::OnLoad()
 	{
 		checkbox2->SetValue(false);
 	}
-
+	
 	if (launch == "true")
 	{
 		checkbox3->SetValue(true);
@@ -324,7 +324,7 @@ void Options::OnLoad()
 void Options::OnAutoscan(wxCommandEvent &event)
 {
 	bool checked = checkbox1->GetValue();
-
+	
 	if (checked)
 	{
 		checkbox2->Enable();
@@ -340,11 +340,11 @@ void Options::OnSave(wxCommandEvent &event)
 {
 	std::string base = get_base_path();
 	fs::path options = base / fs::path("options.ini");
-
+	
 	mINI::INIFile file(options.string());
 	mINI::INIStructure ini;
 	file.read(ini);
-
+	
 	std::string input = directory1->GetPath();
 	std::string output = directory2->GetPath();
 	bool autoscan_value = checkbox1->GetValue();
@@ -353,7 +353,7 @@ void Options::OnSave(wxCommandEvent &event)
 	std::string autoscan = autoscan_value ? "true" : "false";
 	std::string recursive = recursive_value ? "true" : "false";
 	std::string launch = launch_value ? "true" : "false";
-
+	
 	if (input != ini["directory"]["input"] ||
 		output != ini["directory"]["output"] ||
 		autoscan != ini["options"]["autoscan"] ||
@@ -361,22 +361,22 @@ void Options::OnSave(wxCommandEvent &event)
 		launch != ini["options"]["launch"])
 	{
 		ini["directory"].set(
-			{
-				{"input", input},
-				{"output", output}
-			}
+		{
+			{"input", input},
+			{"output", output}
+		}
 		);
-
+		
 		ini["options"].set(
-			{
-				{"autoscan", autoscan},
-				{"recursive", recursive},
-				{"launch", launch}
-			}
+		{
+			{"autoscan", autoscan},
+			{"recursive", recursive},
+			{"launch", launch}
+		}
 		);
-
+		
 		bool write = file.write(ini, true);
-
+		
 		if (write)
 		{
 			fs::path directory = output;
@@ -389,23 +389,23 @@ void Options::OnSave(wxCommandEvent &event)
 				"Error",
 				wxOK | wxICON_ERROR | wxCENTRE
 			);
-
+			
 			return;
 		}
-
+		
 		int answer = wxMessageBox(
-			"You need to restart for the changes to take effect. Restart now?",
-			"Confirm",
-			wxYES_NO | wxCENTRE
-		);
-
+						 "You need to restart for the changes to take effect. Restart now?",
+						 "Confirm",
+						 wxYES_NO | wxCENTRE
+					 );
+					 
 		if (answer == wxYES)
 		{
 			wxGetApp().SetRestart(true);
 			wxGetApp().ExitMainLoop();
 		}
 	}
-
+	
 	Close(true);
 }
 

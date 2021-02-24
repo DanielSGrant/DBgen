@@ -6,7 +6,7 @@
 #endif
 
 
-class Window : public wxFrame
+class Window : public wxFrame, public wxThreadHelper
 {
 	public:
 		Window();
@@ -19,6 +19,19 @@ class Window : public wxFrame
 		void OnMerge(wxCommandEvent &);
 		void OnExit(wxCommandEvent &);
 		void OnKeyDown(wxKeyEvent &);
+		
+		// Thread
+		void OnThreadUpdate(wxThreadEvent &);
+		void OnClose(wxCloseEvent &);
+		
+	protected:
+		virtual wxThread::ExitCode Entry();
+		
+		// the output data of the Entry() routine:
+		char m_data[1024];
+		wxCriticalSection m_dataCS; // protects field above
+		
+		wxDECLARE_EVENT_TABLE();
 		
 	private:
 		wxMenuBar
@@ -37,6 +50,4 @@ class Window : public wxFrame
 		
 		wxTimer
 		*timer;
-		
-		wxDECLARE_EVENT_TABLE();
 };

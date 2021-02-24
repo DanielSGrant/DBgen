@@ -43,7 +43,7 @@ void App::OnBootstrap()
 	{
 		fs::path input = base / fs::path("input");
 		fs::path output = base / fs::path("output");
-		set_default_preferences(input, output, options);
+		set_default_options(input, output, options);
 	}
 	
 	mINI::INIFile file(options.string());

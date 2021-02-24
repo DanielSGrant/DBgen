@@ -40,9 +40,9 @@ std::string get_base_path()
 	return base;
 }
 
-void set_default_preferences(fs::path input, fs::path output, fs::path preferences)
+void set_default_options(fs::path input, fs::path output, fs::path options)
 {
-	mINI::INIFile file(preferences.string());
+	mINI::INIFile file(options.string());
 	mINI::INIStructure ini;
 	
 	ini["directory"]["input"] = input.string();
@@ -58,9 +58,9 @@ void set_default_preferences(fs::path input, fs::path output, fs::path preferenc
 std::vector<std::string> autoscan()
 {
 	std::string base = get_base_path();
-	fs::path preferences = base / fs::path("preferences.ini");
+	fs::path options = base / fs::path("options.ini");
 	
-	mINI::INIFile file(preferences.string());
+	mINI::INIFile file(options.string());
 	mINI::INIStructure ini;
 	file.read(ini);
 	
