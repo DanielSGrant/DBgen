@@ -49,6 +49,7 @@ _deps
 
 
 # Toolkit
+bin/
 build/
 ui/
 *.fasta
