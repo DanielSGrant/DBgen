@@ -1,6 +1,6 @@
 // @TODO:
 // - Use wxThread?
-// - Handle custom events for wxDirPicker to prevent typing
+// - Open explorer/finder after parsing
 // - Store the options in the application/globally?
 // - Add comments
 

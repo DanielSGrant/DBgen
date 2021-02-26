@@ -13,7 +13,7 @@ wxEND_EVENT_TABLE()
 
 About::About() :
     wxFrame(
-        NULL,
+        nullptr,
         wxID_ANY,
         "About",
         wxDefaultPosition,

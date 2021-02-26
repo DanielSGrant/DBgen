@@ -24,7 +24,7 @@ wxEND_EVENT_TABLE()
 
 Options::Options() :
     wxFrame(
-        NULL,
+        nullptr,
         wxID_ANY,
         "Options",
         wxDefaultPosition,
@@ -352,8 +352,8 @@ void Options::OnSave(wxCommandEvent &event)
     mINI::INIStructure ini;
     file.read(ini);
     
-    std::string input = directory1->GetPath();
-    std::string output = directory2->GetPath();
+    std::string input = directory1->GetPath().ToStdString();
+    std::string output = directory1->GetPath().ToStdString();
     bool autoscan_value = checkbox1->GetValue();
     bool recursive_value = checkbox2->GetValue();
     bool launch_value = checkbox3->GetValue();

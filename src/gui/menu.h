@@ -1,3 +1,5 @@
+#pragma once
+
 #include <wx/wxprec.h>
 
 #ifndef WX_PRECOMP
@@ -38,7 +40,7 @@ class Menu : public wxMenuBar
         *menuitem4;
         
         Options
-        *options = NULL;
+        *options = nullptr;
         
         About
         *about = nullptr;

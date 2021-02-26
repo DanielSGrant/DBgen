@@ -5,7 +5,7 @@ if (MSVC)
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 endif()
 
-find_package(wxWidgets REQUIRED)
+find_package(wxWidgets QUIET)
 
 if (wxWidgets_FOUND)
     message(STATUS "wxWidgets libraries found: ${wxWidgets_LIBRARIES}")
