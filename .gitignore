@@ -51,6 +51,7 @@ _deps
 # Toolkit
 bin/
 build/
+sequence/
 ui/
 *.fasta
 *.gb

@@ -49,7 +49,9 @@ About::About() :
         wxDefaultSize,
         0
     );
+    
     title1->Wrap(-1);
+    
     title1->SetFont(
         wxFont(
             12,
@@ -69,7 +71,9 @@ About::About() :
         wxDefaultSize,
         0
     );
+    
     title2->Wrap(-1);
+    
     title2->SetFont(
         wxFont(
             12,
@@ -89,7 +93,9 @@ About::About() :
         wxDefaultSize,
         0
     );
+    
     title3->Wrap(-1);
+    
     title3->SetFont(
         wxFont(
             12,
@@ -109,7 +115,9 @@ About::About() :
         wxDefaultSize,
         0
     );
+    
     name1->Wrap(-1);
+    
     name1->SetFont(
         wxFont(
             wxNORMAL_FONT->GetPointSize(),
@@ -129,7 +137,9 @@ About::About() :
         wxDefaultSize,
         0
     );
+    
     email1->Wrap(-1);
+    
     email1->SetFont(
         wxFont(
             wxNORMAL_FONT->GetPointSize(),
@@ -149,7 +159,9 @@ About::About() :
         wxDefaultSize,
         0
     );
+    
     name2->Wrap(-1);
+    
     name2->SetFont(
         wxFont(
             wxNORMAL_FONT->GetPointSize(),
@@ -169,7 +181,9 @@ About::About() :
         wxDefaultSize,
         0
     );
+    
     email2->Wrap(-1);
+    
     email2->SetFont(
         wxFont(
             wxNORMAL_FONT->GetPointSize(),
@@ -189,7 +203,9 @@ About::About() :
         wxDefaultSize,
         0
     );
+    
     license->Wrap(-1);
+    
     license->SetFont(
         wxFont(
             wxNORMAL_FONT->GetPointSize(),
@@ -209,7 +225,9 @@ About::About() :
         wxDefaultSize,
         0
     );
+    
     copyright->Wrap(-1);
+    
     copyright->SetFont(
         wxFont(
             wxNORMAL_FONT->GetPointSize(),

@@ -83,9 +83,11 @@ Window::Window() :
     );
     
     text->Wrap(-1);
+    
     text->Hide();
     
     listbox = new Listbox(this);
+    
     int count = listbox->GetCount();
     
     if (count > 0)

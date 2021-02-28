@@ -70,7 +70,9 @@ Options::Options() :
         wxDefaultSize,
         0
     );
+    
     title->Wrap(-1);
+    
     title->SetFont(
         wxFont(
             12,
@@ -90,7 +92,9 @@ Options::Options() :
         wxDefaultSize,
         0
     );
+    
     title2->Wrap(-1);
+    
     title2->SetFont(
         wxFont(
             12,
@@ -111,6 +115,7 @@ Options::Options() :
         0
     );
     label1->Wrap(-1);
+    
     label1->SetFont(
         wxFont(
             wxNORMAL_FONT->GetPointSize(),
@@ -131,6 +136,7 @@ Options::Options() :
         0
     );
     label2->Wrap(-1);
+    
     label2->SetFont(
         wxFont(
             wxNORMAL_FONT->GetPointSize(),
@@ -151,6 +157,7 @@ Options::Options() :
         wxSize(400, -1),
         wxDIRP_DEFAULT_STYLE | wxDIRP_DIR_MUST_EXIST
     );
+    
     directory2 = new wxDirPickerCtrl(
         panel1,
         ID_OUTPUT,
@@ -169,7 +176,9 @@ Options::Options() :
         wxDefaultSize,
         0
     );
+    
     checkbox1->SetValue(true);
+    
     checkbox1->SetFont(
         wxFont(
             wxNORMAL_FONT->GetPointSize(),
@@ -189,27 +198,8 @@ Options::Options() :
         wxDefaultSize,
         0
     );
-    checkbox2->SetFont(
-        wxFont(
-            wxNORMAL_FONT->GetPointSize(),
-            wxFONTFAMILY_DEFAULT,
-            wxFONTSTYLE_NORMAL,
-            wxFONTWEIGHT_NORMAL,
-            false,
-            wxEmptyString
-        )
-    );
     
-    checkbox3 = new wxCheckBox(
-        panel1,
-        wxID_ANY,
-        wxT("  Open output directory after processing"),
-        wxDefaultPosition,
-        wxDefaultSize,
-        0
-    );
-    checkbox3->SetValue(true);
-    checkbox3->SetFont(
+    checkbox2->SetFont(
         wxFont(
             wxNORMAL_FONT->GetPointSize(),
             wxFONTFAMILY_DEFAULT,
@@ -250,7 +240,6 @@ Options::Options() :
     sizer6->Add(0, 7, 0, wxALL, 0);
     sizer7->Add(checkbox1, 0, wxALL | wxEXPAND, 5);
     sizer7->Add(checkbox2, 0, wxALL | wxEXPAND, 5);
-    sizer7->Add(checkbox3, 0, wxALL | wxEXPAND, 5);
     sizer6->Add(sizer7, 1, wxALL | wxEXPAND, 5);
     sizer3->Add(sizer6, 0, wxALL | wxEXPAND, 5);
     panel1->SetSizer(sizer3);
@@ -292,7 +281,6 @@ void Options::OnLoad()
     
     std::string &autoscan = ini["options"]["autoscan"];
     std::string &recursive = ini["options"]["recursive"];
-    std::string &launch = ini["options"]["launch"];
     
     directory1->SetPath(input);
     directory2->SetPath(output);
@@ -316,15 +304,6 @@ void Options::OnLoad()
     else
     {
         checkbox2->SetValue(false);
-    }
-    
-    if (launch == "true")
-    {
-        checkbox3->SetValue(true);
-    }
-    else
-    {
-        checkbox3->SetValue(false);
     }
 }
 
@@ -356,16 +335,13 @@ void Options::OnSave(wxCommandEvent &event)
     std::string output = directory1->GetPath().ToStdString();
     bool autoscan_value = checkbox1->GetValue();
     bool recursive_value = checkbox2->GetValue();
-    bool launch_value = checkbox3->GetValue();
     std::string autoscan = autoscan_value ? "true" : "false";
     std::string recursive = recursive_value ? "true" : "false";
-    std::string launch = launch_value ? "true" : "false";
     
     if (input != ini["directory"]["input"] ||
         output != ini["directory"]["output"] ||
         autoscan != ini["options"]["autoscan"] ||
-        recursive != ini["options"]["recursive"] ||
-        launch != ini["options"]["launch"])
+        recursive != ini["options"]["recursive"])
     {
         ini["directory"].set(
         {
@@ -377,8 +353,7 @@ void Options::OnSave(wxCommandEvent &event)
         ini["options"].set(
         {
             {"autoscan", autoscan},
-            {"recursive", recursive},
-            {"launch", launch}
+            {"recursive", recursive}
         }
         );
         

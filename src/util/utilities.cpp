@@ -50,7 +50,6 @@ void set_default_options(fs::path input, fs::path output, fs::path options)
     
     ini["options"]["autoscan"] = "true";
     ini["options"]["recursive"] = "false";
-    ini["options"]["launch"] = "true";
     
     file.generate(ini, true);
 }
