@@ -19,6 +19,7 @@ Input: sequence.gb file from NCBI
 #include <iostream>
 #include <filesystem>
 #include <fstream>
+#include <vector>
 #include <cstring>
 #include <string>
 
@@ -37,7 +38,7 @@ struct Gene
 {
     std::string taxonomy;
     // struct Sequence sequence;
-    std::string sequence;
+    std::vector<std::string> sequence;
 };
 
 struct Node
@@ -87,6 +88,8 @@ void getGBData(Node **data, fs::path input)
     
     // Variable declaration
     std::string temp, tax, species, sequence;
+    std::vector <std::string> seqVec;
+    int stringCount;
     Gene tempGene;
     bool write;
     
@@ -169,6 +172,7 @@ void getGBData(Node **data, fs::path input)
             // Read until sequence data starts or you hit the end of that data point
             while (temp != "ORIGIN" && in >> temp)
             {
+                //If there is no sequence data break to avoid writing incomplete data
                 if (temp == "//")
                 {
                     write = false;
@@ -181,26 +185,35 @@ void getGBData(Node **data, fs::path input)
             if (temp == "ORIGIN")
             {
                 in >> temp;
-                
+                stringCount = 0;
                 do
                 {
                     if (static_cast<int>(temp[0]) > ASCII9 && (temp[0] == 'a' || temp[0] == 'c' ||
                             temp[0] == 'g' || temp[0] == 't' || temp[0] == 'n'))
                     {
                         sequence += temp;
+                        stringCount++;
+                    }
+                    //If string length is over 10000 BP, push to vector and reset to avoid overflow
+                    if(stringCount > 1000)
+                    {
+                        seqVec.push_back(sequence);
+                        stringCount = 0;
                     }
                     
                     in >> temp;
                     
                 }
                 while (temp != "//");
+                //Push latest sequence to seqVec
+                seqVec.push_back(sequence);
             }
             
             // Write data to array if new data is available
             if (write)
             {
                 tempGene.taxonomy = tax;
-                tempGene.sequence = sequence;
+                tempGene.sequence = seqVec;
                 addGene(data, tempGene);
             }
         }
@@ -294,7 +307,7 @@ void writeList(struct Node *node, fs::path output)
         }
         
         // If there are less than 8 pieces of taxonomy info it is valid
-        if (count <= 8)
+        if (count <= 7)
         {
             isValid = true;
         }
@@ -302,14 +315,22 @@ void writeList(struct Node *node, fs::path output)
         // Write valids to valid output file and invalids to invalid output file
         if (isValid)
         {
-            valid << ">" << node->gene.taxonomy << std::endl
-                << node->gene.sequence << std::endl;
+            valid << ">" << node->gene.taxonomy << std::endl;
+            for(auto i = node->gene.sequence.begin(); i != node->gene.sequence.end();i++)
+            {
+                valid << *i;
+            }
+            valid << std::endl;
                 
         }
         else
         {
-            invalid << ">" << node->gene.taxonomy << std::endl
-                << node->gene.sequence << std::endl;
+            invalid << ">" << node->gene.taxonomy << std::endl;
+            for(auto i = node->gene.sequence.begin(); i != node->gene.sequence.end();i++)
+            {
+                invalid << *i;
+            }
+            invalid << std::endl;
         }
         
         // Move to next node
