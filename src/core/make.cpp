@@ -19,7 +19,6 @@ Input: sequence.gb file from NCBI
 #include <iostream>
 #include <filesystem>
 #include <fstream>
-#include <vector>
 #include <cstring>
 #include <string>
 
@@ -38,7 +37,7 @@ struct Gene
 {
     std::string taxonomy;
     // struct Sequence sequence;
-    std::vector<std::string> sequence;
+    std::string sequence;
 };
 
 struct Node
@@ -87,9 +86,7 @@ void getGBData(Node **data, fs::path input)
     in.open(file);
     
     // Variable declaration
-    std::string temp, tax, species, sequence;
-    std::vector <std::string> seqVec;
-    int stringCount;
+    std::string temp, flag, tax, species, sequence;
     Gene tempGene;
     bool write;
     
@@ -170,50 +167,64 @@ void getGBData(Node **data, fs::path input)
             }
             
             // Read until sequence data starts or you hit the end of that data point
-            while (temp != "ORIGIN" && in >> temp)
-            {
-                //If there is no sequence data break to avoid writing incomplete data
-                if (temp == "//")
-                {
-                    write = false;
-                    break;
-                }
+            // while (temp != "ORIGIN" && in >> temp)
+            // {
+            //     //If there is no sequence present break to prevent writing of incomplete data
+            //     if (temp == "//")
+            //     {
+            //         write = false;
+            //         break;
+            //     }
                 
+            // }
+            // in >> flag;
+            //Check for false occurence of the word ORIGIN, rerun previous step if so
+            do
+            {
+                while (in >> temp && temp != "ORIGIN")
+                {
+                    //If there is no sequence present break to prevent writing of incomplete data
+                    if (temp == "//")
+                    {
+                        write = false;
+                        break;
+                    }
+                    
+                }
+                in >> flag;
+                //If the ORIGIN read is false read the next value into temp to avoid loop termination 
+                if(flag != "1")
+                {
+                    in >> temp;
+                }
             }
-            
+            while(flag != "1");
             // If you reach ORIGIN, read in the sequence data
-            if (temp == "ORIGIN")
+            //if (temp == "ORIGIN")
+            if(flag == "1")
             {
                 in >> temp;
-                stringCount = 0;
+                
                 do
                 {
                     if (static_cast<int>(temp[0]) > ASCII9 && (temp[0] == 'a' || temp[0] == 'c' ||
                             temp[0] == 'g' || temp[0] == 't' || temp[0] == 'n'))
                     {
+                        upCase(temp);
                         sequence += temp;
-                        stringCount++;
-                    }
-                    //If string length is over 10000 BP, push to vector and reset to avoid overflow
-                    if(stringCount > 1000)
-                    {
-                        seqVec.push_back(sequence);
-                        stringCount = 0;
                     }
                     
                     in >> temp;
                     
                 }
                 while (temp != "//");
-                //Push latest sequence to seqVec
-                seqVec.push_back(sequence);
             }
             
             // Write data to array if new data is available
             if (write)
             {
                 tempGene.taxonomy = tax;
-                tempGene.sequence = seqVec;
+                tempGene.sequence = sequence;
                 addGene(data, tempGene);
             }
         }
@@ -315,22 +326,14 @@ void writeList(struct Node *node, fs::path output)
         // Write valids to valid output file and invalids to invalid output file
         if (isValid)
         {
-            valid << ">" << node->gene.taxonomy << std::endl;
-            for(auto i = node->gene.sequence.begin(); i != node->gene.sequence.end();i++)
-            {
-                valid << *i;
-            }
-            valid << std::endl;
+            valid << ">" << node->gene.taxonomy << std::endl
+                << node->gene.sequence << std::endl;
                 
         }
         else
         {
-            invalid << ">" << node->gene.taxonomy << std::endl;
-            for(auto i = node->gene.sequence.begin(); i != node->gene.sequence.end();i++)
-            {
-                invalid << *i;
-            }
-            invalid << std::endl;
+            invalid << ">" << node->gene.taxonomy << std::endl
+                << node->gene.sequence << std::endl;
         }
         
         // Move to next node
@@ -387,3 +390,15 @@ inline void deleteList(Node **head)
 //     if (node== NULL)
 //         std::cout << "Finished Displaying List" << std::endl;
 // }
+
+void upCase(std::string &in)
+{
+    int len = static_cast <int> (in.length());
+    for(int i = 0; i < len; i++)
+    {
+        if(in[i] >= 'a' && in[i] <= 'z')
+        {
+            in[i] -= 32;
+        }
+    }
+}
