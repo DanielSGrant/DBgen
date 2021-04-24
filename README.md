@@ -1,3 +1,3 @@
-# Database_Toolkit
+# DBGen
 
-![Bioinformatics](https://github.com/DanielSGrant/Database_Toolkit/blob/main/images/bioinformatics.png)
+![DBGen](https://github.com/DanielSGrant/Database_Toolkit/blob/main/images/dbgen.png)

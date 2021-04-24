@@ -47,19 +47,19 @@ set(
 include(${wxWidgets_USE_FILE})
 
 if (APPLE)
-    add_executable(bioinformatics MACOSX_BUNDLE ${SOURCE})
+    add_executable(DBgen MACOSX_BUNDLE ${SOURCE})
 
     # Set a custom plist file. It is needed for Mac OS Retina display
-    set_target_properties(bioinformatics PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/Info.plist)
+    set_target_properties(DBgen PROPERTIES MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/Info.plist)
 else()
     # WIN32 is for Windows to find WinMain instead of a main function
     # This is ignored on other systems, so it works on all platforms
 
-    add_executable(bioinformatics WIN32 ${SOURCE})
+    add_executable(DBgen WIN32 ${SOURCE})
 endif()
 
 target_include_directories(
-    bioinformatics
+    DBgen
         PRIVATE ${wxWidgets_INCLUDE_DIRS}
         PRIVATE ${CORE}
         PRIVATE ${GUI}
@@ -69,7 +69,7 @@ target_include_directories(
 )
 
 target_link_libraries(
-    bioinformatics
+    DBgen
         ${wxWidgets_LIBRARIES}
 )
 

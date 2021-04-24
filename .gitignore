@@ -48,10 +48,11 @@ CTestTestfile.cmake
 _deps
 
 
-# Toolkit
+# DBgen
 bin/
 build/
 sequence/
 ui/
+instructions.txt
 *.fasta
 *.gb
