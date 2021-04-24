@@ -1,3 +1,3 @@
-# DBGen
+# DBgen
 
-![DBGen](https://github.com/DanielSGrant/Database_Toolkit/blob/main/images/dbgen.png)
+![DBgen](https://github.com/DanielSGrant/DBgen/blob/main/images/dbgen.png)
